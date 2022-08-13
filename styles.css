@@ -150,7 +150,13 @@ hr.line2 {
     gap: 10px;
     padding: 10px; */ 
     }
-    
+
+#button {
+    width: 6em;
+    border: 2px solid green;
+    background: #ffe;
+    border-radius: 5px;
+}
 
 .grid-item {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
