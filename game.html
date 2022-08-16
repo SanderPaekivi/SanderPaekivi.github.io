@@ -18,7 +18,7 @@
     var ballRadius = 10;
     var x = Math.floor(Math.random() * canvas.width)+1;
     var y = canvas.height-30;
-    var dx = Math.floor(Math.random() * 4) -2;
+    var dx = Math.sign((Math.random()*2)-1)*2;
     var dy = -2;
     var paddleHeight = 10;
     var paddleWidth = 100;
@@ -65,7 +65,8 @@
             dy = -dy;
             b.status = 0;
             score ++;
-            dy += (dy/dy)*0.5
+            dy += Math.sign(dy)*0.5;
+            dx += Math.sign((Math.random()*2)-1)*0.3;
             if (score === brickRowCount * brickColumnCount) {
             alert("YOU WIN, CONGRATULATIONS!");
             document.location.reload();
@@ -164,13 +165,13 @@
 
         
         if(rightPressed) {
-            paddleX += 7;
+            paddleX += 11;
             if (paddleX + paddleWidth > canvas.width){
                 paddleX = canvas.width - paddleWidth;
             }
         }
         else if(leftPressed) {
-            paddleX -= 7;
+            paddleX -= 11;
             if (paddleX < 0){
                 paddleX = 0;
             }
