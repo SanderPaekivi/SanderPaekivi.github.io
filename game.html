@@ -35,6 +35,7 @@
     const brickOffsetTop = 30;
     const brickOffsetLeft = 30;
     let score = 0;
+    let lives = 3;
 
 
     const bricks = [];
@@ -98,24 +99,24 @@
                     dy = -dy;
                     b.status = 0;
                     score ++;
-                    dy += Math.sign(dy)*0.2 + Math.sign((Math.random()*2)-1)*0.05;
+                    dy += Math.sign(dy)*0.3 + Math.sign((Math.random()*2)-1)*0.05;
                     dx += Math.sign((Math.random()*2)-1)*0.6;
                     if (score === brickRowCount * brickColumnCount) {
                     alert("YOU WIN, CONGRATULATIONS!");
                     document.location.reload();
-                    clearInterval(interval); // Needed for Chrome to end game
+                     // Needed for Chrome to end game
                         }
                     }
                 else if (which_one === 2 || which_one === 3 ) {
                     dx = -dx;
                     b.status = 0;
                     score ++;
-                    dx += Math.sign(dx)*0.2 + Math.sign((Math.random()*2)-1)*0.05;
+                    dx += Math.sign(dx)*0.3 + Math.sign((Math.random()*2)-1)*0.05;
                     dy += Math.sign((Math.random()*2)-1)*0.6;
                     if (score === brickRowCount * brickColumnCount) {
                     alert("YOU WIN, CONGRATULATIONS!");
                     document.location.reload();
-                    clearInterval(interval); // Needed for Chrome to end game
+                     // Needed for Chrome to end game
                         }
                 }
                 else { 
@@ -126,7 +127,7 @@
                     if (score === brickRowCount * brickColumnCount) {
                     alert("YOU WIN, CONGRATULATIONS!");
                     document.location.reload();
-                    clearInterval(interval); // Needed for Chrome to end game
+                     // Needed for Chrome to end game
                         }
                  }
         }
@@ -139,6 +140,12 @@
         ctx.font = "16px Arial";
         ctx.fillStyle = "#483D8B";
         ctx.fillText(`Score: ${score}`, 8, 20);
+        }
+
+    function drawLives() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "#0095DD";
+        ctx.fillText(`Lives: ${lives}`, canvas.width - 65, 20);
         }
 
 
@@ -192,6 +199,7 @@
         collisionDetection();
         drawPaddle();
         drawScore();
+        drawLives();
         
         if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
             dx = -dx;
@@ -209,15 +217,23 @@
             dx = Math.abs(dx) + Math.sign((Math.random()*2)-1)*0.1;
         }
         else if (x >= paddleX+Math.floor(paddleWidth/3) && x <= paddleX+(2*Math.floor(paddleWidth/3)) ){
+            if ( dy < 1){ dy = (-1)*Math.sign(dy)*2 } else {
             dy = -dy;
             dx += Math.sign((Math.random()*2)-1)*0.1
-            
+            }
         }
 
         else {
+            lives--;
+            if (!lives) {
             alert("GAME OVER");
             document.location.reload();
-            clearInterval(interval);
+            // Needed for Chrome to end game
+            } else {
+            x = canvas.width / 2;
+            y = canvas.height - 30;
+            paddleX = (canvas.width - paddleWidth) / 2;
+            }
         }
         }
 
@@ -237,9 +253,11 @@
         
         x += dx;
         y += dy;
+
+        requestAnimationFrame(draw);
     }
 
-    const interval = setInterval(draw, 10);
+    draw();
   // JavaScript code goes here
 </script>
 
