@@ -8,7 +8,7 @@
     canvas { background: #eee; display: block; margin: 0 auto; }
   </style>
 </head>
-<body class="lock-screen">
+<body>
 
 <div>
 
@@ -52,6 +52,7 @@
     document.addEventListener("touchstart", touchHandler);
     document.addEventListener("touchmove", touchHandler);
 
+
     function mouseMoveHandler(e) {
     const relativeX = e.clientX - canvas.offsetLeft;
     if (relativeX > 0 && relativeX < canvas.width) {
@@ -63,6 +64,7 @@
     if (e.touches) {
         paddleX = e.touches[0].pageX - canvas.offsetLeft - paddleWidth / 2;
         e.preventDefault();
+        document.body.style.overflow = "hidden";
     }
     }
 
