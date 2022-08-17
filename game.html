@@ -102,7 +102,7 @@
                     dy += Math.sign(dy)*0.3 + Math.sign((Math.random()*2)-1)*0.05;
                     dx += Math.sign((Math.random()*2)-1)*0.6;
                     if (score === brickRowCount * brickColumnCount) {
-                    alert("YOU WIN, CONGRATULATIONS!");
+                    alert("YOU WIN, CONGRATULATIONS!")
                     document.location.reload();
                      // Needed for Chrome to end game
                         }
@@ -113,8 +113,10 @@
                     score ++;
                     dx += Math.sign(dx)*0.3 + Math.sign((Math.random()*2)-1)*0.05;
                     dy += Math.sign((Math.random()*2)-1)*0.6;
+                    /*if (score === brickRowCount * brickColumnCount) {
+                    alert("YOU WIN, CONGRATULATIONS!");*/
                     if (score === brickRowCount * brickColumnCount) {
-                    alert("YOU WIN, CONGRATULATIONS!");
+                    alert("YOU WIN, CONGRATULATIONS!")
                     document.location.reload();
                      // Needed for Chrome to end game
                         }
@@ -125,7 +127,10 @@
                     b.status = 0;
                     score ++;
                     if (score === brickRowCount * brickColumnCount) {
-                    alert("YOU WIN, CONGRATULATIONS!");
+                    alert("YOU WIN, CONGRATULATIONS!")
+                    /*if (score == brickRowCount * brickColumnCount) { let phase = 2; drawBricks(); }
+                    else if (score === 2*(brickRowCount * brickColumnCount) && phase === 2) {
+                    alert("YOU WIN, CONGRATULATIONS!");*/
                     document.location.reload();
                      // Needed for Chrome to end game
                         }
