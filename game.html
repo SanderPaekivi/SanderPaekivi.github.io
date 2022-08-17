@@ -79,7 +79,7 @@
                     dy = -dy;
                     b.status = 0;
                     score ++;
-                    dy += Math.sign(dy)*0.2;
+                    dy += Math.sign(dy)*0.2 + Math.sign((Math.random()*2)-1)*0.05;
                     dx += Math.sign((Math.random()*2)-1)*0.6;
                     if (score === brickRowCount * brickColumnCount) {
                     alert("YOU WIN, CONGRATULATIONS!");
@@ -91,7 +91,7 @@
                     dx = -dx;
                     b.status = 0;
                     score ++;
-                    dx += Math.sign(dx)*0.2;
+                    dx += Math.sign(dx)*0.2 + Math.sign((Math.random()*2)-1)*0.05;
                     dy += Math.sign((Math.random()*2)-1)*0.6;
                     if (score === brickRowCount * brickColumnCount) {
                     alert("YOU WIN, CONGRATULATIONS!");
@@ -191,6 +191,7 @@
         }
         else if (x >= paddleX+Math.floor(paddleWidth/3) && x <= paddleX+(2*Math.floor(paddleWidth/3)) ){
             dy = -dy;
+            dx += Math.sign((Math.random()*2)-1)*0.1
             
         }
 
