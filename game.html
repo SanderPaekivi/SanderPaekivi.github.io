@@ -223,9 +223,10 @@
         }
         else if (x >= paddleX+Math.floor(paddleWidth/3) && x <= paddleX+(2*Math.floor(paddleWidth/3)) ){
             if ( dy < 1){ dy = (-1)*Math.sign(dy)*2 } else {
-            dy = -dy;
-            dx += Math.sign((Math.random()*2)-1)*0.1
-            }
+            aa = [Math.abs(dx),Math.abs(dy)]
+            dy = (-1)* Math.max.apply(Math, aa);
+            dx = Math.sign(dx)* Math.max.apply(Math, aa)  
+        }
         }
 
         else {
@@ -237,6 +238,8 @@
             } else {
             x = canvas.width / 2;
             y = canvas.height - 30;
+            dx = Math.abs(dx)
+            dy = (-1)*Math.abs(dy)
             paddleX = (canvas.width - paddleWidth) / 2;
             }
         }
