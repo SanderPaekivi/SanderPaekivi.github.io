@@ -1,88 +1,183 @@
-body {
-    background-color: white;
-    text-align: center;
-    }
-#content {
-    max-width: 1024px;
+.site-header {
     display: flex;
-    margin-left: auto;
-    margin-right: auto;}
-
-h1 {
-    font-family:'Trebuchet MS', sans-serif;
-    margin-left: 20px;
-    margin-right:20px
-    }
-p {
-    /*font-family: 'Trebuchet MS', sans-serif;*/
-    font-family: 'Helvetica Neue', sans-serif; 
-    font-size: 12px
-    }
-
-img {
-    border: 1px solid black
-    }
-.center {
+    justify-content: space-between;
+    position: fixed;
+    height: 75px;
+    background: #463F3A;
+    color: #F4F3EE;
     text-align: center;
-    color:black;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+.header-cont{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    margin-left: 10px; /* to make the site name and socials fit away from walls if need be*/
+    margin-right: 10px;
+}
+
+/* --------------------------- Body divs --------------------------- */
+
+body {
+    background: #F4F3EE;
+    color: #463F3A;
+    font-family: Arial, Helvetica, sans-serif;
+    /*text-align: center; /* needed to remove since image is inline and center forces it off alignment with flex somehow*/ 
+  }
+
+  /* This starts content after sticky height, so no overlap */
+.content {
+    display: flex;
+    flex-direction: column;
+    padding-top: 75px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+/*
+.sticky {
+position: fixed;
+top: 0;
+width: 100%;
+}
+.sticky + .content {
+padding-top: 102px;
+} */
+
+/* --------------------------- Main intro column --------------------------- */
+
+.content-rows{
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.profile-pic{
+    border-radius: 2em; 
+    width: 425px; 
+    height: 550px; 
+    object-fit: cover; 
+    object-position: 0 0; /* This forces the top left of image to be in view with cropping */
+}
+
+
+/* --------------------------- Mobile optimizing --------------------------- */
+
+@media screen and (max-width: 600px){
+    .profile-pic{
+       width: 350px;
+       height: 475px;
     }
-.rcorners1 {
-    border-radius: 25px;
-    background: #F0FFFF;
-    padding: 25px; 
-    margin-left: 40px;
-    margin-right: 40px
+ } 
+
+ @media screen and (max-width: 1024px) and (orientation:portrait){
+    .profile-pic{
+       width: 325px;
+       height: 450px;
     }
-.rcorners2 {
-    border-radius: 25px;
-    background: #F0FFFF;
-    padding: 40px; 
-    margin-left: 40px;
-    margin-right: 40px
+ } 
+
+ @media screen and (max-width: 1024px) and (orientation:portrait){
+    .header-cont{
+        margin-left: 10px;
+        margin-right: 10px;
     }
-hr.line {
-    width: 92%;
-    height:10px;
-    background-color:black
+ } 
+
+
+@media screen and (max-width: 600px){
+    .content-rows{
+       display:flex;
+       flex-direction: column;
     }
-.p1 {
-    font-family: "Times New Roman", Times, serif
+ } 
+ @media screen and (max-width: 600px){
+    .content{
+       padding-top: 75px;
+       margin-left: 10px;
+       margin-right: 10px;
     }
-hr.line2 {
-    width: 90%;
+ }
+
+ @media screen and (max-width: 600px){
+    .site-header{
+    display: flex;
+    justify-content: center;
     }
-.column {
-    float: left;
-    padding: 10px;
+ }
+
+ @media screen and (max-width: 600px){
+    .header-cont{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+ }
+
+
+
+/* --------------------------- Flip cards for apps --------------------------- */
+
+.flip-card {
+    background-color: transparent;
+    width: 300px;
+    height: 300px;
+    perspective: 1000px;
     }
     
-.left {
-    display: inline-block;
-    width: 35%;
+.flip-card-inner {
+    border: 1px solid black;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     }
     
-.right {
-    display: inline-block;
-    width: 45%;
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
     }
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
+    
+.flip-card-front, .flip-card-back {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
     }
-      
-#col1 {
-    display: inline-block;
-    width:40%;
+    
+.flip-card-front {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 25px;
+    color: black;
+    }
+    
+.flip-card-back {
+    background-color: white;
+    color: black;
+    transform: rotateY(180deg);
     }
 
-#col2 {
-    display: inline-block;
-    width:40%;
-    }
+/* ------------------------ Button for flipcards and others ------------------------ */
+
 .button {
+    width: fit-content;
     display: grid;
     font: bold 11px Arial;
+    text-align: center;
     text-decoration: none;
     background-color: #EEEEEE;
     color: #333333;
@@ -91,195 +186,4 @@ hr.line2 {
     border-right: 1px solid #333333;
     border-bottom: 1px solid #333333;
     border-left: 1px solid #CCCCCC;
-    }
-
-.header {
-    padding: 30px;
-    text-align: center;
-    background: #1abc9c;
-    color: white;
-    font-size: 30px;
-    }
-
-.background-img{
-    /* background-image: {{url_for('static', filename='profile_pic2.jpeg' }}; */
-    background-image:url('profile_pic2.jpeg');
-    background-position:top ;
-    background-size: cover;
-    }
-  
-.grid-container {
-    display: grid;
-    grid-auto-rows: auto auto auto auto;
-    grid-auto-columns: 1fr 1fr;
-    grid-template-areas: 'first second' 
-    'first third '
-    'first fourth'
-    'first fifth';
-    margin-top: 20px;
-    margin-left: 40px;
-    margin-right: 40px;
-    /*justify-content: space-evenly; */
-    padding: 10px;
-    column-gap: 20px;
-    /*justify-content: start;*/
-    row-gap: 20px; 
-    /* display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-    gap: 10px;
-    padding: 10px; */ 
-    }
-
-.grid-container2 {
-    display: grid;
-    grid-auto-rows: 1fr 1fr 1fr 1fr;
-    grid-auto-columns: 1fr 1fr;
-    grid-template-areas: 'second second' 
-    'third fourth'
-    'fifth sixth'
-    'seventh eigth';
-    /*margin-top: 20px;
-    margin-left: 40px;
-    margin-right: 40px;*/
-    /*justify-content: space-evenly; 
-    padding: 10px;*/
-    column-gap: 20px;
-    /*justify-content: start;*/
-    row-gap: 20px; 
-    /* display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-    gap: 10px;
-    padding: 10px; */ 
-    }
-
-#button {
-    width: 6em;
-    border: 2px solid green;
-    background: #ffe;
-    border-radius: 5px;
-}
-
-.grid-item {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    border-radius: 25px;
-    margin-top: 10px;
-    padding: 20px;
-    font-size: 12px;
-    /* grid-column: 2; */
-    text-align: center;
-    }
-
-item1 {
-    grid-area: first;
-    grid-row: 1/4;
-    }
-.item2 {
-    grid-area: second;
-    }
-.item3 {
-    grid-area: third;
-    }
-.item4 {
-    grid-area: fourth;
-    }
-.item5 {
-    grid-area: fifth;
-    }
-
-.item6 {
-    grid-area: sixth;
-    }
-.item7 {
-    grid-area: seventh;
-    }
-.item8 {
-    grid-area: eigth;
-    }
-        
-        
-/* .grid-item3 {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    border-radius: 25px;
-    padding: 20px;
-    font-size: 12px;
-    text-align: left;
-    grid-column: 1;
-    grid-row: 1 / 4;
-    }
-.grid-item2 {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    padding: 0px;
-    font-size: 12px;
-    text-align: center;
-    } */
-img {
-    /* flex: 50%; */
-    max-width: 100%;
-    /* max-height: auto; */
-    align-items: center;
-    } 
-.flip-card {
-    background-color: transparent;
-    width: 300px;
-    height: 300px;
-    perspective: 1000px;
-    }
-
-.flip-card-inner {
-    position: relative;
-    width: 100%;
-    /*height: 100%;*/
-    text-align: center;
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    }
-
-.flip-card:hover .flip-card-inner {
-    transform: rotateY(180deg);
-    }
-
-.flip-card-front, .flip-card-back {
-    position: absolute;
-    width: 100%;
-    /*height: 100%;*/
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    }
-
-.flip-card-front {
-    background-color: transparent;
-    color: black;
-    }
-
-.flip-card-back {
-    background-color:green;
-    color: white;
-    transform: rotateY(180deg);
-    }
-
-    
-footer {
-    /*padding: 30px;*/
-    text-align: center;
-    background: #1abc9c;
-    color: white;
-    font-size: 16px;
-    }
-    .contact-list {
-    list-style-type: none;
-    padding: 0;
-    }
-    .contact-list a {
-    padding: 5px;
-    display: inline-block;
-    }
-    
-    .lock-screen {
-        height: 100%;
-        overflow: hidden;
-        width: 100%;
-        position: fixed;
     }
