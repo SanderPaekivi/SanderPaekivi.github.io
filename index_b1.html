@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css" type="text/css" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <title> Implementing the Kalman Filter for adaptive autoregression </title>
+</head>
+
+<body>
+<main>
+
+<div class="site-header"> 
+  
+  <div class="header-cont" style="font-family: 'Didact Gothic'; font-size: 20px; margin-right: 25px;"> 
+    <b style="white-space: pre;">   Implementing the Kalman Filter for adaptive autoregression </b>
+  </div>
+
+</div>
+
+
+<div class="content">
+
+  <div class="content-rows">
+    <!---->
+      <h3>Introduction:</h3>
+
+      <p style="text-align:justify"> 
+      This blog post will cover implementing a Kalman Filter to perform adaptive autoregression, meaning in practise the extraction of autoregression coefficients 
+      in as continuous time as possible. If you found this page, you probably already know something about the topic, but for clarity, let's still cover the 
+      basics, and get toward implementation step-by-step.  
+      </p>
+
+      <p>
+        An autoregressive (AR) process is a model for a random process, which is dependent upon it's own past values - hence the prefix 'auto'. The regression part of the word
+        refers to process of identifying a relationship between dependent and independend variables - in our case, a value for our process X(t) based on X(t-tau) respectively. 
+        An AR model specifies the output to be dependent linearly on its own previous values and on a stochastic term (an imperfectly predictable term or 'error').
+        In formula notation, we write:
+        
+        <!-- view-source:http://latex.userpage.fu-berlin.de/math.html for latex in html!!! -->
+        
+      </p>
+
+
+    <!---->
+  </div>
+
+
+
+</div>
+
+
+
+<footer>
+  <br>
+  <br>
+  <br>
+</footer>
+
