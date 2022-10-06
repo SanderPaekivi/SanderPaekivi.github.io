@@ -6,6 +6,13 @@
   <link rel="stylesheet" href="styles.css" type="text/css" >
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+  </script>
+  <script type="text/javascript"
+    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
   <title> Implementing the Kalman Filter for adaptive autoregression </title>
 </head>
 
@@ -38,6 +45,8 @@
         refers to process of identifying a relationship between dependent and independend variables - in our case, a value for our process X(t) based on X(t-tau) respectively. 
         An AR model specifies the output to be dependent linearly on its own previous values and on a stochastic term (an imperfectly predictable term or 'error').
         In formula notation, we write:
+
+        $$  x(t) = \sum_{i=1}^{p} x(t-i)  $$
         
         <!-- view-source:http://latex.userpage.fu-berlin.de/math.html for latex in html!!! -->
         
