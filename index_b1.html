@@ -7,17 +7,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <title> Implementing the Kalman Filter for adaptive autoregression </title>
-
-  <script type="text/javascript" src="latexmath.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <!-- <script type="text/javascript" src="latexmath.js"></script> -->
 
 </head>
 
 <body>
 <main>
 
-<div class="site-header" style="justify-content: left;"> 
-  <div style="font-family: 'Didact Gothic'; font-size: 20px; margin-right: 25px;"> 
-    <b style="white-space: pre; ">   Implementing the Kalman Filter for adaptive autoregression </b>
+<div class="site-header" style="justify-content: left; "> 
+  <div class="header-cont" style="font-family: 'Didact Gothic'; font-size: 20px; margin-right: 25px; "> 
+    <b style="white-space: pre; ">   Implementing the Kalman Filter for adaptive autoregression 
+    </b>
   </div>
 </div>
 
@@ -25,41 +29,170 @@
 <div class="content" style="margin-top: 0 ; margin-bottom: 0 ;">
 
       <h3>Introduction:</h3>
+      <p style="text-align:justify; "> 
 
-      <p style="text-align:justify; margin-top: 0 ; margin-bottom: 0 ;"> 
         This blog post will cover implementing a Kalman Filter to perform adaptive autoregression, meaning in practise the extraction of autoregression coefficients 
-        in as continuous time as possible. If you found this page, you probably already know something about the topic, but for clarity, let's still cover the 
-        basics, and get toward implementation step-by-step.  
-      </p>
+        in as continuous time as possible. My motivation for looking into this implementation was application to statistical causality analysis, 
+        where issues of non-stationarity can really obfuscate real relationships between time-series. A Kalman Filter based adaptive method was proposed in a variety of scientific
+        papers, however the rigor in theoretical overview was oft lacking and contained errors, as well as the implementation code kept private. In principle, the method could be very powerful, 
+        in practise I have (so far) found that easier solutions work quicker and as effectively though. I currently don't regard this method as highly as I once did, and have not 
+        completely worked out all the nuances involved, however I believe this blog post and the given code can be a fruitful source of information to any who seek to attempt it for 
+        themselves. 
 
-      <p style="text-align:justify; margin-top: 0 ; margin-bottom: 0 ;">
-        An autoregressive (AR) process is a model for a random process, which is dependent upon it's own past values - hence the prefix 'auto'. The regression part of the word
-        refers to process of identifying a relationship between dependent and independend variables - in our case, a value for our process X(t) based on X(t-tau) respectively. 
-        An AR model specifies the output to be dependent linearly on its own previous values and on a stochastic term (an imperfectly predictable term or 'error').
-        In formula notation, we write:
+        <br><br>
+
+        The 
+
+      </p>  
+
+      <h3>Autoregressive modelling:</h3>
+      <p style="text-align:justify; "> 
+        
+        If you found this page, you probably already know something about the topic, but for clarity, let's still cover the basics, and get toward implementation step-by-step. 
+        An autoregressive (AR) process is a model for a time-series process, which is dependent upon it's own past values - hence the prefix 'auto'. Oftan people also speak about 
+        vector-autoregression (VAR), which is the case of multiple time-series interacting with eachother and themselves. The vector part here will become clear soon, if it is not yet so 
+        (it's to do with the mathematical representation). For a single time-series, a simpel AR process is then the regression model between dependent \( y(t) \) and 
+        independend variables \( y(t-\tau) \), with \( \tau \) being the lag or time-delay. How far this lagged influence goes is referred to as the order of the model, \(p\) and a model
+        is written generally as AR(\(p\)) or VAR(\(p\)). 
+
+        <br><br>
+
+        Mathematically we write the example AR(\(p\)) process as:
         <!-- view-source:http://latex.userpage.fu-berlin.de/math.html for latex in html!!! -->
+
+        \[
+          y \left( t \right) = \sum_{\tau=1}^{p} c_\tau \ y \left( t-\tau \right) + \epsilon(t)
+        \]
+  
+        Here we read it as modelling the value of the process \( y(t) \) at time \( t \) by summing over it's past values to a lag of \( \tau \), while multiplying each of these 
+        past values by a coefficient \( c_\tau \). In this manner, the coefficients describe the influence of a past value, for all values of \( t \)! They cannot change, once the model
+        has been fit. This is alright, if the underlying properties of the process do not change in this time frame. In any case however, we never expect the model coefficients to be
+        able to match the lefthand side of the equation 100% due to noize in the data or errors in data measurement, thus this part is modelled with the \(\epsilon(t)\) term. In practise
+        this is simply the residual of the modeled value (righthand side summation) subtracted from the actual value. 
+
+        <br><br>
+
+        To find these coefficients \( c_\tau \), we need to solve the above equation with the constraint that the \(\epsilon(t)\) term is as small as possible, minimizing the error. 
+        To do this, we'll make use of matrix notation, to enable us fast extension to multiple time-series cases and also... it's just simpler like this. The above equation can be equally
+        restated as:
+
+        \[
+        \overbrace{Y}^\text{N x 1}  = \overbrace{X}^\text{N x \(p\)} \times \overbrace{A}^\text{\(p\) x 1} + \overbrace{E}^\text{N x 1} 
+        \]
+
+        We now have the lagged value matrix capital X, which contains N rows of \(p\) columns, where each row represents the \(p\) lagged values of a particular \( y(t) \) where 
+        \( t \in(1,2,3,...,N) \) and
+        a matrix of regression coefficients, \( A \), which contains M rows and one column - there are only one set of these coefficients for all time points. A matrix multiplication 
+        between these two yields a sequence of equations that make up the summation based formula, for each time step \( t \). Now we express the error term, specifically its 'norm' - 
+        square absolute error, and minimize this criteria (there are other ways to fit a regression model, but this is know nas the Ordinary Least Squares or OLS method, which is most common),
+        do some matrix algebra (it's relatively simple to follow along here, but not necessary), and get the following expression:
+
+        \[
+        ||\epsilon ||^2 = ||Y - XA||^2 = (Y-XA)^T (Y-XA) = YY^T A^T X^T Y - Y^T X A + A^T X^T X^T A
+        \]
+
+        We now take it's partial derivative of the error with respect to the A matrix (coefficients), set it to zero (thus the solution we obtain is at a stationary point for the 
+        target variable), and get the formula:
+
+        \[
+        A = (X^T X)^{-1} X^T Y
+        \]
+
+        What this means is, that given that we know what are both \( Y \) and \( X \) (from the real data, they are just a combination of values at \( t \) and it's lags), to get 
+        regression coefficients that provide a minimum value for the error term \( \epsilon \) - thus giving as accurate a translation from past values to future ones! 
+
+      </p>  
+
+      <h3>Recursive Autoregressive modelling:</h3>
+      <p style="text-align:justify; "> 
+
+        Now, how do we get from this to the Kalman Filter? Well there's one more step in between (at least one that I'll touch upon), before we get there. We will also discuss the 
+        principle of a Recursive Least Squares estimator or RLS. This algorithm is the same as the previous OLS one, but employed for situations, where you get more data and don't
+        wish to fully re-evaluate the model, but add to a previously evaluated one. That is to say, immagine you fit an OLS model coefficients for 1 million data points, and get one more
+        point... or even a few thousand or more.. to rerun the whole dataset can be time consuming, so a method was developed to take an old regression model, and 'update' it with new data only.
+        
+        <br><br>
+
+        Let's focuse on the formula for A and specifically, it's component \( X \). It is a matrix with size \( N \times p \), and as an example for a \( p=3 \), AR(3) process it contains 
+        \( y(t-1), ..., y(t-p) \) in it's rows, starting from  \( t+p+1 \) to facilitate \( p \) lags. 
+
+        \[ y(4-1), ..., y(4-p) \]
+        \[ y(5-1), ..., y(5-p) \]
+        \[ ... \]
+        \[ y(N-1), ..., y(N-p) \]
+
+        Let's create an auxillary function to represent the multiplication \( (X^T X) \):
+
+        \[
+        u_i=[y(i-1),y(i-2),…,y(i-p)]
+        \]
+
+        with which we can write:
+
+        \[
+        F_N = X^T X = \sum_{i}^N = u_i u_i^T       
+        \]
+
+        \[
+        X^T Y = \sum_i^N u_i y(i)
+        \]
+
+        with the appropriate initial \( i \). Now, manipulating the summation limit, we can write these elements as:
+
+        \[
+        \sum_i^{N+1} u_i u_i^T = \sum_i^N u_i u_i^T + u_{N+1} u_{N+1}^T
+        \]
+
+        Now, combining these modifications into a \( F_{N+1} \) variant, we soon will see why we are going through this derivation in the first place:
+
+        \[
+        F_{N+1}^{-1} = F_{N}^{-1} - \frac{
+          F_{N}^{-1} u_{N+1} u_{N+1}^T  F_{N}^{-1}
+        }{
+          1 + u_{N+1}^T  F_{N}^{-1} u_{N+1}
+        }
+        \]
+
+        Denoting part of the fraction as \( K \) and then rewriting the function with it:
+
+        \[
+        K_{N+1} = \frac{
+          F_{N}^{-1} u_{N+1}
+        }{
+          1 + u_{N+1}^T  F_{N}^{-1} u_{N+1}
+        }
+        \]
+
+        \[
+        F_{N+1}^{-1} = F_{N}^{-1} - K_{N+1} u_{N+1}^T F_N^{-1}
+        \]
+
+        Which in turn reveals a simpler formula for \( K \) itself, that we used to get previous formula:
+
+        \[
+        K_{N+1} = F_{N+1}^{-1} u_{N+1}
+        \]
+
+        And with this, we arrive at a new, reccursively updateable formula for A:
+
+        \[
+        A_{N+1} = A_N + K_{N+1} ( y(N+1) - u_{N+1}^T A_N )
+        \]
+
+
+
+
+
+
+
+
+
+
+
+        
       </p>
 
-  </div>
 
-  <div style="width: 100%;">
-      <p style="justify-content: center;">
-      \begin{equation}
-        x \left( t \right) = \sum_{i=1}^{p} x \left( t-i \right)
-      \end{equation}
-      </p>
-  </div>
-
-<div class="content">
-
-      <p style="text-align:justify; margin-top: 0 ; margin-bottom: 0 ;">
-        text text text etc etc ... 
-      </p>
-
-      \[
-      \frac{d}{dx}(\frac{x^{2}}{\sqrt{1-x^{2}}}) \quad  or \quad \frac{d}{dx}\left( 
-      \frac{x^{2}}{\sqrt{1-x^{2}}}\right) 
-      \]
           
 
 
