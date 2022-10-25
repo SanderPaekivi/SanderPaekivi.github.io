@@ -476,8 +476,33 @@ for adaptive autoregression</b>
           y_t = \sum_{\tau=1}^{p} c_\tau(t) \ y_{t-\tau} + \epsilon(t)
         \]
         
-        Here, \(y_t\) can be considered a vector of time-series values at time \(t\), but for simplicity of notation I'll keep the lowercase letter. 
-        This is the same equation for an AR process that we started with (albeit with time dependence denoted as an lower index), just the coefficients now evolve in tiem. 
+        As this is the same equation for an AR process that we started with (albeit with time dependence denoted as an lower index), just the coefficients now evolve in time.
+        Here, \(y_t\) can be considered a vector of time-series values at time \(t\), but for simplicity of notation I'll keep the lowercase letter. The same is true for the 
+        coefficients \(c_{\tau}\), which inside the summation are still vectors - one for each equation, from all other equations, at the lag \(\tau\). 
+        
+        \[
+        c_{\tau} = \begin{bmatrix}
+        c_{11}(\tau) c_{12}(\tau) ... c_{1D}(\tau) \\
+        c_{21}(\tau) c_{22}(\tau) ... c_{2D}(\tau) \\
+        \vdots \\
+        c_{D1}(\tau) c_{D2}(\tau) ... c_{DD}(\tau)
+      \end{bmatrix}
+      \ \ \ \ \ \ 
+      
+      y_t = \begin{bmatrix}
+      y_{1,t} \\
+      y_{2,t} \\
+      \vdots \\
+      y_{D,t}
+      \end{bmatrix}
+
+      \]
+        
+        with \(D\) being the dimensionality or number of time-series in the VAR model we are solving. These example coefficients apply for the first time-series, as the index \(ij\) represents
+        the regression coefficient in the direction \( j \rightarrow i \). <br> 
+
+        We could format this entirely as a matrix multiplication as well, and we shal - but for this we need to include some additional matrix stacking tools. Let's get right to it! <br><br> 
+                
         To estimate such coefficients, we formulate a state-space model with the following components: 
 
         \[
@@ -504,7 +529,8 @@ for adaptive autoregression</b>
         Cov(v_t)=Q_t
         \]
 
-        This model is then estimated through the standard Kalman Filter stepwise algorithm. First, the 'estimation step':
+        This model is then estimated through the standard Kalman Filter stepwise algorithm. <br>
+        First, the 'estimation step':
 
         \[
         \hat{X}_{t+1|t} = \hat{X}_{t|t}
@@ -515,7 +541,8 @@ for adaptive autoregression</b>
         \]
 
         Here the lower indexes \( t|t \) and \( t+1|t \) represent the values before and after iterating through the state equation respectively (or after and before the measurement step, respectively).
-        Just a reminder - this implies an infinite recursion, which is true, but in practise we just fix an initial guess and start from there. Next comes the 'Measurement update' step:
+        Just a reminder - this implies an infinite recursion, which is true, but in practise we just fix an initial guess and start from there. <br>
+        Next comes the 'Measurement update' step:
 
         \[
         e_{t+1} = y_{t+1} - C_t^T \hat{X}_{t+1|t}
@@ -550,8 +577,7 @@ for adaptive autoregression</b>
         
         The above list of coefficients in this specific order, multipled by the vectorized \(p\) past values of the measurement vector that has been Kronecker multiplied in turn with 
         a \(D\text{x}D\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. <br><br>
-        !NB: The \(c_{ij}\) format used here is something that previously was hidden inside the VAR equation. It is read as coefficient of influence in the direction \(j \rightarrow i \), 
-        and if we write out a system of equations instead of a vector equation, each equation contains coefficients in their direction. <br>
+        !NB: The \(c_{ij}\) format used here is the same as explained above before the vectorization operation - this is the result of that procedure! <br>
         !NB2: the notation \(\hat{X}\) is represented as "Xhat" in the code, with "Xhatminus" beign the prior and "Xhatplus" the posterior, or \(\hat{X}_{k|k}\) and \(\hat{X}_{k+1|k}\) respectively
         (some sources simply note the indexes not by \(k|k\) and \(k+1|k\), but \(k-1|k\) and \(k|k\) respectively, and I've lost track of which source I used at which point of development). 
 
