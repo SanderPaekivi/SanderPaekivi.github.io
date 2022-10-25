@@ -31,6 +31,12 @@
       <h3>Introduction:</h3>
       <p style="text-align:justify; "> 
 
+        If you found yourself on this page, I assume you've developed an interest in applying the promising Kalman Filter algorithm for regression tasks, hoping to perhaps deal with 
+        issues of non-stationarity or simply obtain a higher time resolution for your results. What ever the specifics, I've been down that road and decided to write up some steps 
+        that I've found useful in understanding the algorithm and my basic implementation. 
+
+        <br><br>
+
         This blog post will cover implementing a Kalman Filter to perform adaptive autoregression, meaning in practise the extraction of autoregression coefficients 
         in as continuous time as possible. My motivation for looking into this implementation was application to statistical causality analysis, 
         where issues of non-stationarity can really obfuscate real relationships between time-series. A Kalman Filter based adaptive method was proposed in a variety of scientific
@@ -39,21 +45,17 @@
         completely worked out all the nuances involved, however I believe this blog post and the given code can be a fruitful source of information to any who seek to attempt it for 
         themselves. 
 
-        <br><br>
-
-        The 
 
       </p>  
 
       <h3>Autoregressive modelling:</h3>
       <p style="text-align:justify; "> 
         
-        If you found this page, you probably already know something about the topic, but for clarity, let's still cover the basics, and get toward implementation step-by-step. 
-        An autoregressive (AR) process is a model for a time-series process, which is dependent upon it's own past values - hence the prefix 'auto'. Oftan people also speak about 
-        vector-autoregression (VAR), which is the case of multiple time-series interacting with eachother and themselves. The vector part here will become clear soon, if it is not yet so 
-        (it's to do with the mathematical representation). For a single time-series, a simpel AR process is then the regression model between dependent \( y(t) \) and 
-        independend variables \( y(t-\tau) \), with \( \tau \) being the lag or time-delay. How far this lagged influence goes is referred to as the order of the model, \(p\) and a model
-        is written generally as AR(\(p\)) or VAR(\(p\)). 
+        To start off, lets briefly cover step-by-step the conventional autoregressive (AR) process - it is a model for a time-series process, which is dependent upon it's own past 
+        values - hence the prefix 'auto'. Oftan people also speak about vector-autoregression (VAR), which is the case of multiple time-series interacting with eachother and 
+        themselves. The vector part here will become clear soon, if it is not yet so (it's to do with the mathematical representation). For a single time-series, a simpel AR process 
+        is then the regression model between dependent \( y(t) \) and independend variables \( y(t-\tau) \), with \( \tau \) being the lag or time-delay. How far this lagged 
+        influence goes is referred to as the order of the model, \(p\) and a model is written generally as AR(\(p\)) or VAR(\(p\)). 
 
         <br><br>
 
@@ -82,13 +84,13 @@
 
         We now have the lagged value matrix capital X, which contains N rows of \(p\) columns, where each row represents the \(p\) lagged values of a particular \( y(t) \) where 
         \( t \in(1,2,3,...,N) \) and
-        a matrix of regression coefficients, \( A \), which contains M rows and one column - there are only one set of these coefficients for all time points. A matrix multiplication 
+        a matrix of regression coefficients, \( A \), which contains \(p\) rows and one column - there are only one set of these coefficients for all time points. A matrix multiplication 
         between these two yields a sequence of equations that make up the summation based formula, for each time step \( t \). Now we express the error term, specifically its 'norm' - 
-        square absolute error, and minimize this criteria (there are other ways to fit a regression model, but this is know nas the Ordinary Least Squares or OLS method, which is most common),
-        do some matrix algebra (it's relatively simple to follow along here, but not necessary), and get the following expression:
+        square absolute error, and minimize this criteria (there are other ways to fit a regression model, but this is know nas the Ordinary Least Squares or OLS method, which is most common).
+        After some matrix algebra (it's relatively simple to follow along here, but not necessary), and get the following expression:
 
         \[
-        ||\epsilon ||^2 = ||Y - XA||^2 = (Y-XA)^T (Y-XA) = YY^T A^T X^T Y - Y^T X A + A^T X^T X^T A
+        || E ||^2 = ||Y - XA||^2 = (Y-XA)^T (Y-XA) = YY^T A^T X^T Y - Y^T X A + A^T X^T X^T A
         \]
 
         We now take it's partial derivative of the error with respect to the A matrix (coefficients), set it to zero (thus the solution we obtain is at a stationary point for the 
@@ -106,11 +108,11 @@
       <h3>Recursive Autoregressive modelling:</h3>
       <p style="text-align:justify; "> 
 
-        Now, how do we get from this to the Kalman Filter? Well there's one more step in between (at least one that I'll touch upon), before we get there. We will also discuss the 
-        principle of a Recursive Least Squares estimator or RLS. This algorithm is the same as the previous OLS one, but employed for situations, where you get more data and don't
-        wish to fully re-evaluate the model, but add to a previously evaluated one. That is to say, immagine you fit an OLS model coefficients for 1 million data points, and get one more
-        point... or even a few thousand or more.. to rerun the whole dataset can be time consuming, so a method was developed to take an old regression model, and 'update' it with new data only.
-        
+        The next useful (side)step (in my humble opinion) in understanding the Kalman Filter is the Recursive AR process! 
+        Consider this - what if we fit an AR model, and then got more data. We could just re-evaluate the model, but perhaps this is time consuming due to the size of our dataset... 
+        Perhaps there is a way to avoid fully re-evaluating the model? This is where the Recursive Least Squares (RLS) method comes into play, yielding the Recursive Autoregressive 
+        model! This algorithm basically updates an older models coefficients by new data, without reevaluating the whole dataset. Let's get started with some intuitive math.
+
         <br><br>
 
         Let's focuse on the formula for A and specifically, it's component \( X \). It is a matrix with size \( N \times p \), and as an example for a \( p=3 \), AR(3) process it contains 
@@ -143,7 +145,10 @@
         \sum_i^{N+1} u_i u_i^T = \sum_i^N u_i u_i^T + u_{N+1} u_{N+1}^T
         \]
 
-        Now, combining these modifications into a \( F_{N+1} \) variant, we soon will see why we are going through this derivation in the first place:
+        Now, the above is essentially a \( F_{N+1} \) expression. <br><br>
+        Since in the equation for our coefficients \(A\) includes the inverse of this multiplication, we will apply the 
+        Matrix Inversion Lemma to it (if this sounds like much, it's just a proven formula for specific setups of
+        matrix equations), and get the following: 
 
         \[
         F_{N+1}^{-1} = F_{N}^{-1} - \frac{
@@ -167,28 +172,173 @@
         F_{N+1}^{-1} = F_{N}^{-1} - K_{N+1} u_{N+1}^T F_N^{-1}
         \]
 
-        Which in turn reveals a simpler formula for \( K \) itself, that we used to get previous formula:
+        Which in turn, after some substitutions reveals a simpler formula for \( K \) itself, that we used to get previous formula:
 
         \[
         K_{N+1} = F_{N+1}^{-1} u_{N+1}
         \]
 
-        And with this, we arrive at a new, reccursively updateable formula for A:
+        Ok so now we need to figure out the component: \( X^T Y = \sum_i^N u_i y(i) \) - the second half of our coefficients expression. 
+        <br><br>
+        We will split it's sum to an \(N\) and \(N+1\) component, utilize the discovered equations for \(K\) and
+        \(F\), do some algebra and arrive at a result that I hope will be useful in understanding the inner workings of the Kalman Filter, without having to derrive it (it's much more tricky and tedious).
+        <br><br>
+        Consider we start from \(N+1\) samples, whiddle down from there. We can write \(A\) as:
+
+        \[
+        A_{N+1} = (X^T X)^{-1} X^T Y = F_{N+1}^{-1} \sum_i^{N+1} u_i y(i) = F_{N+1}^{-1} \biggl( \sum_i^{N} u_i y(i) + u_{N+1} y(N+1) \biggr)
+        \]
+
+        Substituting \(F_{N+1}^{-1} \) for it's previous iteration form and \( K \) summation:
+        
+        \[
+        \biggl( F_{N}^{-1} - K_{N+1} u_{N+1}^T F_N^{-1} \biggr)\sum_i^{N} u_i y(i) + F_{N+1}^{-1} u_{N+1} y(N+1) 
+        \]
+        
+        Opening up the brackets:
+
+        \[
+        \overbrace{ F_{N}^{-1} \sum_i^{N} u_i y(i) }^\text{optimal sol. at N}  - K_{N+1} u_{N+1}^T \overbrace{ F_N^{-1} \sum_i^{N} u_i y(i) }^\text{optimal sol. at N} + \overbrace{ F_{N+1}^{-1} u_{N+1} }^\text{K} y(N+1) 
+        \]
+        
+        And with this, picking up the pieces into brackets and expressing K where possible, we arrive at a new, reccursively updateable formula for A:
 
         \[
         A_{N+1} = A_N + K_{N+1} ( y(N+1) - u_{N+1}^T A_N )
         \]
 
+        The component \( K \) is oftan in Kalman Filtering called the 'gain matrix', and it has different derivation paths, however the main goal of this component is the same in RLS as in
+        Kalman Filtering - weight up how much to adjust the coefficients of regression based on how large the error between the new measurement and old model prediction is! NB: I'm talking
+        about the Kalman Filter for the purpose of regression - somethign it's not really built for and most literature does not talk in terms relating to this.  
+      </p>
+      
+      <h3>Kalman Filter for adaptive autoregression:</h3>
+      <p style="text-align:justify; "> 
 
+        To start off, lets cover the basic application example of a Kalman Filter, introducing the concept state-space modelling in the process.
 
+        <br><br>
 
+        Consider a moving car and how we could know it's position. Well, we need some initial info, where the machien was before and how fast it's moving. We can also perhaps utilize
+        GPS to find the cars position. Both methods will have some error. For estimation by past position and velocity we might make an error in those measurements, but also have the issue of estimating
+        a continuous parameter in finite time, the offset of calculation time causes an error in the long term (more a theoretical issue, if we don't refresh our measurements at some point).
+        For a GPS, errors arise from latency and instrument precision etc. A Kalman Filters goal in such a situation is to balance out the errors of both sources of information, to yield 
+        a position estimate with higher accuracy than with either method alone.   
 
+        Now, while the idea is relatively simple, quite specific issues arise in implementation. Namely, what do we compare either estimate to? What is the 'true' position? How are the 
+        errors in either measurement different? What are the properties of these errors in terms of a stochastic process? 
 
+        Lets write out a simple state-space equation for the problem of a moving car, and see what's what. First, the main system of equations:
 
+        \[
+        X = \begin{pmatrix} x \\ \dot{x} \end{pmatrix}  \ \ \ \ \  F = \begin{pmatrix} 1 & \Delta t\\ 0 & 1 \end{pmatrix} \ \ \ \ \ H = \begin{pmatrix} 1 \\ 0 \end{pmatrix}
+        \]
 
+        \[
+        X_k = F X_{k-1} + w_k \]
+        \[
+        Z_k = H X_k + v_k
+        \]
 
+        One can multiply the matrix equations into a simpler form and notice that there is an equation for \(X\), which is simply the physical equations of motion, and then there's an equation for
+        \(Z\), which is in fact the position attained from a GPS. X is called the 'state' of the system and can be estimated iteratively from previous states, by some equations connecting past to present.
+        The \(Z\) equation is known as the 'measurement' equation, which states a relationship between the state estimate and the GPS estimate, their difference being governed by the noise 
+        term \(v_k\). The latter does not help us 'estimate' a better value for the position directly, 
+        but the relationship is what we build the Kalman Filter upon, specifically the Kalman Gain matrix \(K\) (similar to the RLS matrix \(K\)).
 
+        The noise terms are assumed to be zero centered and with independend covariance matrixes:
 
+        \[
+        w_k \sim N(0,Q)
+        \]
+        \[
+        v_k \sim N(0,R)
+        \]
+        
+        These covariance matrixes must be estimated to actually make use of the Kalman Filter and the state-space equations. Generally, for conventional applications like the example here,
+        \(Q\) is proportional to velocity and \(R\) might be derived based on the construction of the GPS system, however neither are known 100%. The value of this type of setup is that we can employ the Kalman Filter algorithm to recursively estimate a position for our vehicle, with noizy measurements from a GPS, by also considering 
+        how a car previously at position 1 can get to position 2 at a given speed. All the information is there for us, we just use physics to improve GPS accuracy.
+
+        <br><br>
+
+        We can do the same 
+        for regression problems, however with some trickery. The main idea is to swap the 'state' equation for one evolving regression coefficients in time, and the 'measurement' equation for 
+        the regression model itself! Some difficulties arise due to us not havng any good idea on how to pick \(R\) however, as we generally will be dealing with already measured data from less defined
+        measurement device (not impossible, just in practise rarely the case). NB: we must choose an \(R\), as we cannot assume that our measured data is 100% accurate, otherwise the algorithm cannot balance 
+        different noise sources. A second problem arises from choosing a state equation - while a car will move based on the laws of motion, how should regression coefficients evolve in time? 
+
+        <br><br>
+
+        These problems are not trivial, but generally simple solutions work well enough, e.g. evolving coefficients as a random walk process, thus \(Q\) defines a pseudo adaption-rate, 
+        which becomes a tuning parameter. The covariance \(R\) represent then the coefficients suitability for modeling via regression a real measured value \(Z\). \(R\) in this setup is usually
+        fixed as a constant or estimated from the data recursively. 
+
+        <br><br>
+
+        For a more in depth yet still simple derivation of the Kalman Filter equations, I suggest reading Vivek Yadavs post on TowardsDataScience on the discrete Kalman Filter. Here I will 
+        skip the derivation and simply present the formulation of an autoregressive model in a state-space format, and the stepst to solve it by Kalman Filtering.   
+        
+        Let's get started with the Kalman Filter implementation for adaptive regression. What we want is essentially a model like:
+        
+        \[
+          y_t = \sum_{\tau=1}^{p} c_\tau(t) \ y_{t-\tau} + \epsilon(t)
+        \]
+        
+        This is the same equation for an AR process that we started with (albeit with time dependence denoted as an lower index), just the coefficients now evolve in tiem. 
+        To estimate such coefficients, we formulate a state-space model with the following components: 
+
+        \[
+        a_t = vec([c_1(t), ..., c_p(t)]^T) \ \ \ \ \ Y_t = ( y_{t}^T, y_{t-1}^T, ...,  y_{t-p+1}^T ) \ \ \ \ \ C_t = I_d \otimes Y_t^T
+        \]
+
+        where \(\otimes\) is the Kronecker product, serving as a matrix stackign operator here and allowing VAR models to be estimated. The model is then written as: 
+
+        \[
+        a_{t+1} = a_t + v_t
+        \]
+        \[
+        y_{t} = C_{t-1}^T a_t + \epsilon_t
+        \]
+
+        with
+
+        \[
+        Cov(\epsilon_t)=R_t
+        \]
+        \[
+        Cov(v_t)=Q_t
+        \]
+
+        This model is then estimated through the standard Kalman Filter stepwise algorithm. First, the 'estimation step':
+
+        \[
+        a_{t+1|t} = a_{t|t}
+        \]
+
+        \[
+        P_{t+1|t} = P_{t|t} + Q_t
+        \]
+
+        Here the lower indexes \( t|t \) and \( t+1|t \) represent the values before and after iterating through the state equation respectively (or after and before the measurement step, respectively).
+        Just a reminder - this implies an infinite recursion, which is true, but in practise we just fix an initial guess and start from there. Next comes the 'Measurement update' step:
+
+        \[
+        e_{t+1} = y_{t+1} - C_t^T a_{t+1|t}
+        \]
+        \[
+        S_{t+1} = ( C_t^T P_{t+1|t} C_t + R_t )
+        \]
+        \[
+        G_{t+1} = P_{t+1|t} C_t S^{-1}_{t+1} 
+        \]
+        \[
+        a_{t+1|t+1} = a_{t+1|t} + G_{t+1} \epsilon_{t+1}
+        \]
+        \[
+        P_{t+1|t+1} = (I - G_{t+1}C_t^T)P_{t+1|t}
+        \]
+
+        at which point \( t+1|t+1 \) becomes \( t|t \) and we move to the next measurement in the loop. 
         
       </p>
 
