@@ -507,7 +507,111 @@
       <h4>Rudimentary Python implementation:</h4>
       <p style="text-align:justify; "> 
 
+        I've build my implementation to operate on data in the form of a pandas dataframe, with columns representing time indexes, and rows representing distinct time-series - 
+        the measurement dimensions. Considering \(D\) to be the dimensionality, or the number of time-series (with length \(N\) steps) analysied in the VAR model, and \(p\) the regression order, then 
+        the code yields a \(N-p\) coefficient matrixes. The latter are structured as follows:
 
+        \[
+        [c_{11}(t-1), c_{12}(t-1), ..., c_{1D}(t-1), c_{11}(t-2), ..., c_{1D}(t-p), c_{21}(t-1),...,c_{2D}(t-1),...c_{DD}(t-p)]
+        \]
+        
+        The above list of coefficients in this specific order, multipled by the vectorized \(p\) past values of the measurement vector that has been Kronecker multiplied in turn with 
+        a \(DxD\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. 
+
+        <br><br>
+
+        I've included comments in the code to certain scientific paper that discuss an implementation such as this - their citations are given below the snipet. 
+
+
+        <pre class="line-numbers">
+          <code class="language-css">
+            def kalman_var(data_in, order, lamda = 0.03): #The lambda parameter is set to 0.03 by default, since that is what many use, citing efficiency (see Milde 2010)
+
+              import numpy as np
+              
+              data = data_in.values #making the data into a numpy array for comfortable manipulation
+              lam = lamda #Lambda is a sort of adaptation constant, governing the change of measurement noize, which in our-case is pseudonoise of the TS process itself
+              p = order #VAR model order
+              
+              m = data.shape[0] #Checking how many rows in data input = dimensions or number of time-series
+              sL = data.shape[1] #Checking length of time-series, "sL" as in series-length
+              
+              unit=p*m
+              tab = np.zeros([m, m], dtype=object)
+              for i in range(1,m+1):
+                  for j in range(1,m+1):
+                      temp_tab = []
+                      for add in range(0,p):
+                          temp_tab.append(
+                              ((unit*(i-1))+(j-1))+(m*add)
+                          )
+                      tab[j-1,i-1] = temp_tab # COLUMNS means TO WHERE, row means FROM WHERE 
+
+              Xhatminus = [0]*(p*m**2)
+              # Below here im making a Xhatminus that is essentially the naive prediction for the first step (average of own values til p of past steps)
+              for i in range(len(tab)):
+                  for j in range(len(tab[i])):
+                      for coef_i in tab[i][j]:
+                          if i == j:
+                              Xhatminus[coef_i] = (1/p)
+                          else:
+                              Xhatminus[coef_i] = 0
+
+              F = np.identity((m**2)*p) #F is the transition matrix, when it is a unit matrix it indicates that the coefficients evolve as a random walk. 
+              Q = np.identity((m**2)*p)*(10**(-2)) #Q is the state process noise covariance matrix. The states evolve independently, so unity matrix. Multiplied by a small number to indicate some noize in their initial evolution
+              E = np.array([1]*m) #Just initializing the error holder or in fact, the measurement process noize values. This is not used and calculated later as series_value - predicted_value 
+              R = np.identity(m) #np.dot(data_in.iloc[:,0:10],data_in.iloc[:,0:10].transpose()) #Initializing covariance of data noize through data itself, values up to 10. Should then start analysis from 10th time point, but for testing its ok. 
+              Pmin = np.identity((m**2)*p)  #The initial one step ahead prediction of the state covariance. 
+              Yhat = np.zeros((m,(sL))) #Creating a prediction array, that will contain predicted values based on the state estimates
+
+              Xhatstorage = [Xhatminus]*p
+              Errorstorage = [[0]*m]*p
+              Rstorage = [np.eye(m)]*p #[[[1, 1],[1, 1]]]*p
+              Pstorage = [np.identity((m**2)*p)]*p
+
+              for i in range(p,sL): #This is the Kalman VAR reccursion, based on Havlicek 2010 and Schlögl 2000 (specifically the adaption criteria lambda etc)
+                  
+                  Y = data[:,range((i-p),i+1)] #Partitioning necessary data for p-length loop, including next one for update and prediction comparison.
+                  H = np.kron( np.identity(m) , Y[:, range(0,p)].transpose().flatten() )
+                  K = np.dot( np.dot(Pmin, H.transpose()) , np.linalg.inv( np.dot( np.dot( H, Pmin ), H.transpose() ) + R ) ) #Calculating the Kalman Gain
+                  d  = Y[:,p] - np.dot(H, Xhatminus)
+                  Xhatplus = np.dot(F , ( Xhatminus + np.dot(K ,  d) ) ) #Calculating new coefficients
+                  E = Y[:,p] - np.dot(H, Xhatplus) #Calculating error from estimate and actual time-series noise
+                  R2 = lam*R + (1-lam)*( np.dot([[item] for item in E],[E]) + np.dot(np.dot(H,Pmin),np.transpose(H)) )
+                  R = R2
+                  P = Pmin - np.dot( np.dot(K , H) , Pmin ) #Calculating the estimate error covariance - this is essentially the estimate of the error from the REAL coefficients, we are trying to find - separate from state evolution noise. 
+                  Q2 = lam*Q + (1-lam)*( np.dot(np.dot(K, np.dot([[item] for item in d],[d]) ),np.transpose(K)) )
+                  Q = Q2
+                  Pplus = ( np.dot( np.dot(F, P) , F) ) + Q #Updating the estimate error covariance
+                  Pmin = Pplus
+
+                  Errorstorage.append(E)
+                  Xhatstorage.append(Xhatplus) #storing loop values, moving on after that
+                  Rstorage.append(R)
+                  Xhatminus = Xhatplus
+                  Pstorage.append(Pplus)
+
+                  for h in range(0,m):
+                      Yhat[h,i] = np.dot(H[h], Xhatplus)
+
+              return Yhat, Xhatstorage, Errorstorage, Rstorage, Pstorage
+
+
+          </code>
+        </pre>
+
+        Relevant citations:
+        <br>
+        1) Milde 2010, doi: 10.1016/j.neuroimage.2009.12.110. Epub 2010 Jan 7. <br>
+        2) Havlicek 2010,  doi: 10.1016/j.neuroimage.2010.05.063. Epub 2010 Jun 1. <br>
+        3) Schlögl 2000, doi: 10.1109/IEMBS.2000.898046 <br>
+        4) Akhlaghi 2017, doi: 10.1109/PESGM.2017.8273755 <br>
+        5) Oya 2007, doi: 10.1016/j.biosystems.2006.05.018 
+
+        <br><br>
+        <br><br>
+
+        To make further use of this analysis, below I present a simple simulation framework to test the filter. 
 
       </p>
 
