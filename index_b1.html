@@ -481,7 +481,7 @@
         To estimate such coefficients, we formulate a state-space model with the following components: 
 
         \[
-        a_t = vec([c_1(t), ..., c_p(t)]^T) \ \ \ \ \ Y_t = ( y_{t}^T, y_{t-1}^T, ...,  y_{t-p+1}^T ) \ \ \ \ \ C_t = I_d \otimes Y_t^T
+        \hat{X}_t = vec([c_1(t), ..., c_p(t)]^T) \ \ \ \ \ Y_t = ( y_{t}^T, y_{t-1}^T, ...,  y_{t-p+1}^T ) \ \ \ \ \ C_t = I_d \otimes Y_t^T
         \]
 
         where \(vec\) is the vectorization operator (stacking a matrixes rows into a vector), and \(\otimes\) is the Kronecker product, both serving as a matrix stacking 
@@ -489,7 +489,7 @@
         The model is then written as: 
 
         \[
-        a_{t+1} = a_t + v_t
+        \hat{X}_{t+1} = \hat{X}_t + v_t
         \]
         \[
         y_{t} = C_{t-1}^T a_t + \epsilon_t
@@ -507,7 +507,7 @@
         This model is then estimated through the standard Kalman Filter stepwise algorithm. First, the 'estimation step':
 
         \[
-        a_{t+1|t} = a_{t|t}
+        \hat{X}_{t+1|t} = \hat{X}_{t|t}
         \]
 
         \[
@@ -518,7 +518,7 @@
         Just a reminder - this implies an infinite recursion, which is true, but in practise we just fix an initial guess and start from there. Next comes the 'Measurement update' step:
 
         \[
-        e_{t+1} = y_{t+1} - C_t^T a_{t+1|t}
+        e_{t+1} = y_{t+1} - C_t^T \hat{X}_{t+1|t}
         \]
         \[
         S_{t+1} = ( C_t^T P_{t+1|t} C_t + R_t )
@@ -527,7 +527,7 @@
         G_{t+1} = P_{t+1|t} C_t S^{-1}_{t+1} 
         \]
         \[
-        a_{t+1|t+1} = a_{t+1|t} + G_{t+1} \epsilon_{t+1}
+        \hat{X}_{t+1|t+1} = \hat{X}_{t+1|t} + G_{t+1} \epsilon_{t+1}
         \]
         \[
         P_{t+1|t+1} = (I - G_{t+1}C_t^T)P_{t+1|t}
@@ -547,8 +547,13 @@
         [c_{11}(t-1), c_{12}(t-1), ..., c_{1D}(t-1), c_{11}(t-2), ..., c_{1D}(t-p), c_{21}(t-1),...,c_{2D}(t-1),...c_{DD}(t-p)]
         \]
         
+        
         The above list of coefficients in this specific order, multipled by the vectorized \(p\) past values of the measurement vector that has been Kronecker multiplied in turn with 
-        a \(D\text{x}D\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. 
+        a \(D\text{x}D\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. <br><br>
+        !NB: The \(c_{ij}\) format used here is something that previously was hidden inside the VAR equation. It is read as coefficient of influence in the direction \(j \rightarrow i \), 
+        and if we write out a system of equations instead of a vector equation, each equation contains coefficients in their direction. <br>
+        !NB2: the notation \(\hat{X}\) is represented as "Xhat" in the code, with "Xhatminus" beign the prior and "Xhatplus" the posterior, or \(\hat{X}_{k|k}\) and \(\hat{X}_{k+1|k}\) respectively
+        (some sources simply note the indexes not by \(k|k\) and \(k+1|k\), but \(k-1|k\) and \(k|k\) respectively, and I've lost track of which source I used at which point of development). 
 
         <br><br>
 
