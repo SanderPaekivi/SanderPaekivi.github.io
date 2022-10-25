@@ -19,6 +19,9 @@
     padding: 20px;
     margin-left: 10px; /* to make the site name and socials fit away from walls if need be*/
     margin-right: 10px;
+    padding-left: 15%;
+    padding-right: 15%;
+
 }
 
 /* --------------------------- Body divs --------------------------- */
