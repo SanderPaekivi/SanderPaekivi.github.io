@@ -37,14 +37,29 @@
 
         <br><br>
 
-        This blog post will cover implementing a Kalman Filter to perform adaptive vector-autoregression, meaning in practise the extraction of autoregression coefficients 
+        This blog post is a summary of what I've learned in my attempts to wrangle the Kalman Filter for the purpose of adaptive vector-autoregression - in practise the extraction of autoregression coefficients 
         in as continuous time as possible, between as many time-series as necessary. My motivation for looking into this implementation was application to statistical causality analysis, 
         where issues of non-stationarity can really obfuscate real relationships between time-series. A Kalman Filter based adaptive method was proposed in a variety of scientific
         papers, however the rigor in theoretical overview was oft lacking and contained errors, as well as the implementation code kept private. In principle, the method could be very powerful, 
-        in practise I have (so far) found that easier solutions work quicker and as effectively though. I currently don't regard this method as highly as I once did, and have not 
-        completely worked out all the nuances involved, however I believe this blog post and the given code can be a fruitful source of information to any who seek to attempt it for 
-        themselves. 
+        in practise I have (so far) found that easier solutions work quicker and as effectively though. 
+        
+        <br> <br>
 
+        I currently don't regard this method as highly as I once did, and have not completely worked out all the nuances involved. There are many complexities involved and my practical 
+        experience has proven simpler methods to be more approachable and by extension more productive. Nevertheless I decided to write up this summary in hopes that it can at leasts 
+        be of assistance to others pursuing the same goal. 
+        
+        <br><br>
+        
+        The post is structured as follows: 
+        
+        <ol>
+          <li>A basic derivation of Ordinary Least Squares (OLS) for regression</li>
+          <li>A basic derivation of Recursive Least Squares (RLS) for regression </li>
+          <li>A basic derivation of the discrete Kalman Filter how to adapt it for regression </li>
+          <li>A rudimentary implementation of the above in Python</li>
+          <li>Closing remarks, relevant citations and link to GitHub with other related code samples</li>
+        </ol>  
 
       </p>  
 
@@ -212,7 +227,7 @@
         about the Kalman Filter for the purpose of regression - somethign it's not really built for and most literature does not talk in terms relating to this.  
       </p>
       
-      <h3>Kalman Filter for adaptive autoregression:</h3>
+      <h3>Kalman Filter:</h3>
       <p style="text-align:justify; "> 
 
         To start off, lets cover the basic application example of a Kalman Filter, introducing the concept state-space modelling in the process.
@@ -276,7 +291,7 @@
         <br><br>
 
       </p>
-      <h4>Abstract derivation:</h4>
+      <h4>Discrete Kalman Filter derivation:</h4>
       <p style="text-align:justify; "> 
 
         Let's start with a state-space equation, keeping the components abstract for now:
@@ -435,7 +450,7 @@
         variables, that can fit the regression coefficients into the state X.
 
       </p>
-      <h4>Specific setup for regression:</h4>
+      <h4>Kalman Filter setup for regression:</h4>
       <p style="text-align:justify; "> 
 
         Let's finalize the Kalman Filter for regression. To do so, we restate the model we wish to solve:
@@ -655,12 +670,16 @@
       </p>
 
       <p> 
-        The effectiveness of the extracted regression coefficients depend on proper parameter tuning, initial values and data preprocessing. As of now, the code presented above is 
-        simply a starting place, and needs further work. Other related algorithms can be found in my Github under the <a href=https://github.com/SanderPaekivi/KalmanFilter-VectorAutoregression- style=”display:none”>"KalmanFilter-VectorAutoregression"</a> repo. 
+        Having gotten to the end, I stress again that the effectiveness of the extracted regression coefficients depend on proper parameter tuning, initial values and data 
+        preprocessing. The algorithm most certainly needs quite a bit more work, mainly in optimization and better selection of R, Q, and initial parameters. 
+        My aim with this summary post is to provide a holistic overview for amateurs in dealing with Kalman Filters, who wish to try their hand in implementation, or are simply curious about 
+        the intuitive workings of such algorithms. <br> 
+        
+        Other algorithms I've worked on in relation to the Kalman Filter VAR can be found in my Github under the <a href=https://github.com/SanderPaekivi/KalmanFilter-VectorAutoregression- style=”display:none”>"KalmanFilter-VectorAutoregression"</a> repo. 
         
         <br><br>
 
-        I hope this overview has been helpful in covering the basic intuition and general operating principles of the Kalman Filter, specifically using it for adaptive autoregression. 
+        I hope this overview has been helpful and wish you the best of luck in atempting to wrangle the Kalman Filter! 
       </p>
 
 
