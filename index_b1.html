@@ -275,15 +275,176 @@
 
         <br><br>
 
-        For a more in depth yet still simple derivation of the Kalman Filter equations, I suggest reading Vivek Yadavs post on TowardsDataScience on the discrete Kalman Filter. Here I will 
-        skip the derivation and simply present the formulation of an autoregressive model in a state-space format, and the stepst to solve it by Kalman Filtering.   
+      </p>
+      <h4>Abstract derivation:</h4>
+      <p style="text-align:justify; "> 
+
+        Let's start with a state-space equation, keeping the components abstract for now:
         
-        Let's get started with the Kalman Filter implementation for adaptive regression. What we want is essentially a model like:
+        \[
+        X_{k+1} = A X_k + w_k \ \ \ \ \ \ \ \langle w_k w_k^T \rangle = Q
+        \]
+        \[
+        Y_k = C X_k + v_k \ \ \ \ \ \ \ \langle v_k v_k^T \rangle = R
+        \]
+
+        Here we expand the notation a bit, using from now on \(X_{k|k}\) for the estimate of \(X\) at time \(k\), and \(X_{k+1|k}\) for the one step ahead estimate or evolution of the 
+        state X. Now we can calculate for example the expected future value of the state:
+
+        \[
+        \langle X_{k+1|k} \rangle = A\langle X_{k|k} \rangle + \overbrace{w_k}^\text{ = 0} \rightarrow \hat{X}_{k+1|k} = A \hat{X}_{k|k}
+        \]
+
+        from which we can get the error/deviation to be expected between the estimate and real value of the state:
+
+        \[
+        X_{k+1|k} - \hat{X}_{k+1|k} = A X_{k|k} + w_k - (A \hat{X}_{k|k})
+        \]
+
+        and denoting \( \epsilon_{k+1|k} = X_{k+1|k} - \hat{X}_{k+1|k} \) we can write:
+
+        \[
+        \epsilon_{k+1|k} = A \epsilon_{k|k} + w_k
+        \]
+
+        Next up, we estimate a covariance for the state (before measurement is taken into account). That is, we are estimating the covariance of the state X, not it's driving process, 
+        whose covariance is Q. We call this new covariance \(P\) and calculate it as:
+
+        \[
+        P_{k+1|k} = \langle \epsilon_{k+1|k} \epsilon_{k+1|k}^T \rangle = \langle [ X_{k+1|k} - \hat{X}_{k+1|k} ] [ X_{k+1|k} - \hat{X}_{k+1|k} ]^T \rangle \rightarrow 
+        \]
+        \[
+        \rightarrow P_{k+1|k} = A \langle \epsilon_{k|k} \epsilon_{k|k}^T \rangle A^T + \overbrace{\langle w_k w_k^T \rangle}^\text{ = Q} \rightarrow 
+        \]
+        \[
+        \rightarrow P_{k+1|k} = A P_{k|k} A^T + Q 
+        \]
+
+        Now we need to update this state covariance based on the discrepancy between the state-based estimate of the time-series value and the measurement (the actual value we have).
+        That's to say, based on the error term making up the noise process \(v_t\). To do this, we need to model the measurement too however, as we cannot assume it to be immutable and 100% accurate. 
+
+        \[
+        Y_{k+1} = C X_{k+1|k} + \overbrace{v_{k+1}}^{ \langle v_{k+1} \rangle = 0  } \rightarrow \langle Y_{k+1} \rangle = \hat{Y}_{k+1} = C \hat{X}_{k+1|k}
+        \]
+        \[
+        Y_{k+1} - \hat{Y}_{k+1} = C X_{k+1|k} + v_{k+1} - (C \hat{X}_{k+1|k}) 
+        \]
+        \[
+        \epsilon_{Y;k+1} = C \epsilon_{k+1|k} + v_{k+1}
+        \]
+
+        The notation of \( \epsilon_{Y;k+1} \) is a bit cumbersome, but notice the \(Y\) in there before the time step notation. This essentially gives us a link between the covariance of the state
+        and measurement. Moving on, we need to use this knowledge to update the state, based on the incoming measurement. We do this by proposing (in this derivation) an ansatz or educated guess
+        that we can do this similarly to the RLS algorithm:
+
+        \[
+        \hat{X}_{k+1|k+1} = \hat{X}_{k+1|k} + K_{k+1} ( Y_{k+1} - [ C \hat{X}_{k+1|k} ] )
+        \]
+
+        where \( K \) is a gain that adapts the new error to the previous estimates. We need to find it's shape however - it's not the same as in RLS. We can do that by some further 
+        algebra and with a bit of derivatives:
+
+        \[
+        \hat{X}_{k+1|k+1} = \hat{X}_{k+1|k} + K_{k+1} \epsilon_{Y;k+1}
+        \]
+        \[
+        \hat{X}_{k+1|k+1} = \hat{X}_{k+1|k} + K_{k+1}  C \epsilon_{k+1|k} + K_{k+1} v_{k+1}
+        \]
+
+        The last line tells us how the state will be updated based on the error between the actual measurement and the expected measurement (based on the former state), and as we wish this error
+        to be minimal, we can do that by choosing the right \(K\). NB: we want to optimize \(K\) based on the state, i.e. tho have the state approach a hypothetical "true" state as closely as possible, 
+        thus we employ it's covariance matrix \(P\) and seek to have it's derivative with respect to \(K\) to be zero. Let's construct a new \( \epsilon_{k|k} \) for the Gain influenced formula, then the respective 
+        \(P\), then take the derivative and see where we end up.
+
+        \[
+        X_{k+1} - \hat{X}_{k+1|k+1} = X_{k+1} - \hat{X}_{k+1|k} - K_{k+1} C \epsilon_{k+1|k} - K_{k+1}v_{k+1}
+        \]
+        \[
+        \epsilon_{k+1|k+1} = (I - K_{k+1}C)\epsilon_{k+1,k} - K_{k+1}v_{k+1}
+        \]
+
+        The covariance is then:
+
+        \[
+        P_{k+1|k+1} = \langle \epsilon_{k+1|k+1} \epsilon_{k+1|k+1}^T \rangle
+        \]
+
+        which after some algebra yields a relationship with it's previous values:
+        
+        \[
+        P_{k+1|k+1} = (I - K_{k+1}C)P_{k+1|k}(I-K_{k+1}C)^T + K_{k+1} R K_{k+1}^T 
+        \]
+
+        Taking a partial derivative of the trace of the above (the trace of the covariance are the errors, however operating on the covariance matrix is necessary to acces them all in a VAR context), 
+        with respect to \(K\) (requires some calculation, consider trace operator properties in relation to derivatives, skipped here to result):
+
+        \[
+        \frac{\delta}{\delta K_{k+1}}\text{tr}[P_{k+1|k+1}] = 0 - (2 C P_{k+1|k})^T + 2 K_{k+1} (C P_{k+1|k}C^T + R)
+        \]
+
+        which yields for \(K\) the following expression:
+
+        \[
+        K_{k+1} = P_{k+1|k} C^T (C P_{k+1|k}C^T + R)^{-1}
+        \]
+
+        NB: there's some position swapping taking place here due to the transposes. Also, the component with the inverse brackets around it is oftan noted in literature as \(S\). 
+
+        If we now substitute this \(K\) into the formula for \(P_{k+1|k+1}\), we get our final update equation (after which we will also list the steps involved in utilizing them):
+
+        \[
+        P_{k+1|k+1} = (I - K_{k+1}C)P_{k+1|k}
+        \]
+
+        How do we actually use these equations now? Well, we start with an initial estimate or best guess for \(X\), then calculate the error between measurement and state-based estimate, 
+        calculate the Kalman Gain, update the state \(X\) with the Gain, update the state covariance similarly, propagate the state forward (through the covariance matrix, the coefficients are developed only 
+        by the Kalman Gain, not actual noise addition - the latter is important for deriving proper equations, but it's mean is zero) and repeat!
+
+        Puting the operations in order, we have the Kalman Filter algorithm as a list of steps: 
+
+        <br>
+        State evolution:
+
+        \[
+        \hat{X}_{k+1|k} = A \hat{X}_{k|k} + w_k
+        \]
+        \[
+        P_{k+1|k} = A P_{k|k}A^T + Q
+        \]
+
+        <br>
+        Update step:
+
+        \[
+        \epsilon_{Y;k+1} = Y_{k+1} - C \hat{X}_{k+1|k}
+        \]
+        \[
+        S_{k+1} = (C P_{k+1|k}C^T + R)
+        \]
+        \[
+        K_{k+1} = P_{k+1|k} C^T S_{k+1}^{-1}
+        \]
+        \[
+        \hat{X}_{k+1|k+1} = \hat{X}_{k+1|k} + K_{k+1}\epsilon_{Y;k+1}
+        \]
+        \[
+        P_{k+1|k+1} = (I - K_{k+1} C) P_{k+1|k}
+        \]
+
+        and rinse-and-repeat! This is all well and good, but how to actually use the above to perform Kalman Filtered adaptive regression? For this, we need to bring in some clever 
+        variables, that can fit the regression coefficients into the state X.
+
+      </p>
+      <h4>Specific setup for regression:</h4>
+      <p style="text-align:justify; "> 
+
+        Let's finalize the Kalman Filter for regression. To do so, we restate the model we wish to solve:
         
         \[
           y_t = \sum_{\tau=1}^{p} c_\tau(t) \ y_{t-\tau} + \epsilon(t)
         \]
         
+        Here, \(y_t\) can be considered a vector of time-series values at time \(t\), but for simplicity of notation I'll keep the lowercase letter. 
         This is the same equation for an AR process that we started with (albeit with time dependence denoted as an lower index), just the coefficients now evolve in tiem. 
         To estimate such coefficients, we formulate a state-space model with the following components: 
 
@@ -291,7 +452,9 @@
         a_t = vec([c_1(t), ..., c_p(t)]^T) \ \ \ \ \ Y_t = ( y_{t}^T, y_{t-1}^T, ...,  y_{t-p+1}^T ) \ \ \ \ \ C_t = I_d \otimes Y_t^T
         \]
 
-        where \(\otimes\) is the Kronecker product, serving as a matrix stackign operator here and allowing VAR models to be estimated. The model is then written as: 
+        where \(vec\) is the vectorization operator (stacking a matrixes rows into a vector), and \(\otimes\) is the Kronecker product, both serving as a matrix stacking 
+        operators, allowing VAR models to be estimated (multiplying out an example will yield \(D\) equations of order \(p\), with \(D\) being the number of time-series in the VAR). 
+        The model is then written as: 
 
         \[
         a_{t+1} = a_t + v_t
@@ -340,6 +503,12 @@
 
         at which point \( t+1|t+1 \) becomes \( t|t \) and we move to the next measurement in the loop. 
         
+      </p>
+      <h4>Rudimentary Python implementation:</h4>
+      <p style="text-align:justify; "> 
+
+
+
       </p>
 
 
