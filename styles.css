@@ -79,6 +79,13 @@ padding-top: 102px;
     }
  } 
 
+ @media screen and (max-width: 800px){
+    .profile-pic{
+       width: 300px;
+       height: 420px;
+    }
+ } 
+
  @media screen and (max-width: 1024px) and (orientation:portrait){
     .profile-pic{
        width: 325px;
