@@ -254,7 +254,7 @@ for adaptive autoregression</b>
         !NB: From here on, we start using the variable \(X\) as a coefficient holder in regression terms. Just a change in notation that kind off leaked through, so keep it in mind. <br><br>
         
         To start off, lets cover the basic application example of a Kalman Filter, introducing the concept state-space modelling in the process.<br>
-        Consider a moving car and how we could know it's position. Well, we need some initial info, where the machien was before and how fast it's moving. We can also perhaps utilize
+        Consider a moving car and how we could know it's position. Well, we need some initial info, where the machine was before and how fast it's moving. We can also perhaps utilize
         GPS to find the cars position. Both methods will have some error. For estimation by past position and velocity we might make an error in those measurements, but also have the issue of estimating
         a continuous parameter in finite time, the offset of calculation time causes an error in the long term (more a theoretical issue, if we don't refresh our measurements at some point).
         For a GPS, errors arise from latency and instrument precision etc. A Kalman Filters goal in such a situation is to balance out the errors of both sources of information, to yield 
@@ -487,11 +487,11 @@ for adaptive autoregression</b>
         coefficients \(c_{\tau}\), which inside the summation are still vectors - one for each equation, from all other equations, at the lag \(\tau\). 
         
         \[
-        c_{\tau} = \begin{bmatrix}
-        c_{11}(\tau) c_{12}(\tau) ... c_{1D}(\tau) \\
-        c_{21}(\tau) c_{22}(\tau) ... c_{2D}(\tau) \\
+        c_{\tau}(t) = \begin{bmatrix}
+        c_{11}^{\tau}(t) c_{12}^{\tau}(t) ... c_{1D}^{\tau}(t) \\
+        c_{21}^{\tau}(t) c_{22}^{\tau}(t) ... c_{2D}^{\tau}(t) \\
         \vdots \\
-        c_{D1}(\tau) c_{D2}(\tau) ... c_{DD}(\tau)
+        c_{D1}^{\tau}(t) c_{D2}^{\tau}(t) ... c_{DD}^{\tau}(t)
       \end{bmatrix}
       \ \ \ \ \ \ 
       
@@ -582,7 +582,8 @@ for adaptive autoregression</b>
         
         
         The above list of coefficients in this specific order, multipled by the vectorized \(p\) past values of the measurement vector that has been Kronecker multiplied in turn with 
-        a \(D\text{x}D\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. <br><br>
+        a \(D\text{x}D\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. The object 'Xhatstorage' in the below code
+        contains a list of such coefficient matrixes, each element in the list corresponding to a time step. <br><br>
         !NB: The \(c_{ij}\) format used here is the same as explained above before the vectorization operation - this is the result of that procedure! <br>
         !NB2: the notation \(\hat{X}\) is represented as "Xhat" in the code, with "Xhatminus" beign the prior and "Xhatplus" the posterior, or \(\hat{X}_{k|k}\) and \(\hat{X}_{k+1|k}\) respectively
         (some sources simply note the indexes not by \(k|k\) and \(k+1|k\), but \(k-1|k\) and \(k|k\) respectively, and I've lost track of which source I used at which point of development). 
