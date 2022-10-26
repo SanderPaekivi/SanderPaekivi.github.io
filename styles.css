@@ -72,7 +72,7 @@ padding-top: 102px;
 
 /* --------------------------- Mobile optimizing --------------------------- */
 
-@media screen and (max-width: 800px){
+@media screen and (max-width: 600px){
     .profile-pic{
        width: 280px;
        height: 400px;
@@ -94,7 +94,7 @@ padding-top: 102px;
  } 
 
 
-@media screen and (max-width: 800px){
+@media screen and (max-width: 600px){
     .content-rows{
        display:flex;
        flex-direction: column;
@@ -107,7 +107,7 @@ padding-top: 102px;
         padding-right: 2%;
     }
  } 
- @media screen and (max-width: 800px){
+ @media screen and (max-width: 600px){
     .content{
        padding-top: 75px;
        margin-left: 10px;
@@ -117,14 +117,14 @@ padding-top: 102px;
     }
  }
 
- @media screen and (max-width: 800px){
+ @media screen and (max-width: 600px){
     .site-header{
     display: flex;
     justify-content: center;
     }
  }
 
- @media screen and (max-width: 800px){
+ @media screen and (max-width: 600px){
     .header-cont{
         display: flex;
         justify-content: center;
