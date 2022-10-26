@@ -150,10 +150,14 @@ for adaptive autoregression</b>
         Let's focuse on the formula for A and specifically, it's component \( X \). It is a matrix with size \( N \times p \), and as an example for a \( p=3 \), AR(3) process it contains 
         \( y(t-1), ..., y(t-p) \) in it's rows, starting from  \( t+p+1 \) to facilitate \( p \) lags. 
 
-        \[ y(4-1), ..., y(4-p) \]
-        \[ y(5-1), ..., y(5-p) \]
-        \[ ... \]
-        \[ y(N-1), ..., y(N-p) \]
+        \[
+        X = \begin{bmatrix}
+        y(4-1), ..., y(4-p) \\
+        y(5-1), ..., y(5-p) \\
+        \vdots \\
+        y(N-1), ..., y(N-p)
+      \end{bmatrix}
+        \]
 
         Let's create an auxillary function to represent the multiplication \( (X^T X) \):
 
@@ -247,10 +251,9 @@ for adaptive autoregression</b>
       <h3>Kalman Filter:</h3>
       <p style="text-align:justify; "> 
 
-        To start off, lets cover the basic application example of a Kalman Filter, introducing the concept state-space modelling in the process.
-
-        <br><br>
-
+        !NB: From here on, we start using the variable \(X\) as a coefficient holder in regression terms. Just a change in notation that kind off leaked through, so keep it in mind. <br><br>
+        
+        To start off, lets cover the basic application example of a Kalman Filter, introducing the concept state-space modelling in the process.<br>
         Consider a moving car and how we could know it's position. Well, we need some initial info, where the machien was before and how fast it's moving. We can also perhaps utilize
         GPS to find the cars position. Both methods will have some error. For estimation by past position and velocity we might make an error in those measurements, but also have the issue of estimating
         a continuous parameter in finite time, the offset of calculation time causes an error in the long term (more a theoretical issue, if we don't refresh our measurements at some point).
@@ -320,6 +323,9 @@ for adaptive autoregression</b>
         Y_k = C X_k + v_k \ \ \ \ \ \ \ \langle v_k v_k^T \rangle = R
         \]
 
+        Crucial to point out here, is that the matrix \(A\) modulates the propagation of the 'state'. As we intend to hide the regression coefficients in there,
+        I point out that \(A\) will be chosen as a unit-matrix, essentially making the coefficients evolve unbiased. It can be a different matrix however, and is kept 
+        in the formulas and derivation. <br> 
         Here we expand the notation a bit, using from now on \(X_{k|k}\) for the estimate of \(X\) at time \(k\), and \(X_{k+1|k}\) for the one step ahead estimate or evolution of the 
         state X. Now we can calculate for example the expected future value of the state:
 
