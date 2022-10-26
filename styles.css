@@ -74,8 +74,8 @@ padding-top: 102px;
 
 @media screen and (max-width: 600px){
     .profile-pic{
-       width: 350px;
-       height: 475px;
+       width: 325px;
+       height: 450px;
     }
  } 
 
@@ -103,8 +103,7 @@ padding-top: 102px;
  @media screen and (max-width: 600px){
     .content{
        padding-top: 75px;
-       margin-left: 3px;
-       margin-right: 10px;
+       justify-content: center;
     }
  }
 
