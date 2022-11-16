@@ -699,21 +699,52 @@ def constrainedSubarrayHist(A, limit):
         <br><br>
 
         Another way to define the threshold heuristically, deciding ourselves what constitutes "too large" of a change in the day to day temperature such that we would not consider the days 
-        to have had "roughly the same" temperature. That is a decent interpretation of the subarray problem. 
+        to have had "roughly the same" temperature. That is a decent interpretation of the subarray problem. Immagine a summer week, where every 
+        day the temperature is around ... 30 degrees Celsius. One day it's 31, then 29, then 32, etc. These are all consecutive days within a 4 degree threshold, for example. 
+        As the summer ends, more and more the temperatures lower, but gradually. When a sudden shift happens, say 31,29,25,20 - here we are breaking form and seeing extreme changes. 
+        The lengths between these extreme events is what we are measuring, in both cases - what is different is the thresholds meaning.  
         
         <br><br>
 
-        I opt here for the quantile approach, as what constitutes a change from the norm in Estonia is probably not the same for Portugal, so the local 20 year based extremes should be more 
-        comparable. 
-
-
+        Both can be useful, so I'll demonstrate them here together. First the quantile approach. I choose the cosntraint to be the 95th quantile, that is to say, I count the number of sequential
+        days where the largest difference of temperatures is no greater than the difference seen only 5% of the days in the past 20 years. This value will be different for the regions, but it's
+        proportional meaning is the same. From the 20 years of data, I count how many times did any length of such continuous sequences occur, and plot the relevant histogram for Portugal and 
+        Estonia below:
         </p>
         
         <div style="text-align:center" >
           <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="b2_histogram.png" alt="Histogram of extreme bounded sequence lengths.">
         </div>
 
+        <p style="text-align:justify; ">
+        
+          We notice very little deviation from the two histograms, but a clear preference for longer sequences by Estonia. That is to say, there are on average longer periods of days
+          where the temperature does not shift by the 95th quantile shift. 
 
+          <br><br>
+
+          A bit more clearer is the second approach. Let's simply say, that we are looking for the distribution of lengths of sequential days, wehere the maximal difference in 
+          temperatures does not cross 4 degrees. Perhaps it's a bit low, but it should not change the relationship of the two countries histograms much. 
+
+        </p>
+
+        <div style="text-align:center" >
+          <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="b2_histogram_v2.png" alt="Histogram of extreme bounded sequence lengths.">
+        </div>
+
+        <p style="text-align:justify; ">
+
+          It turns out, that for a fixed temperature threshold, the differences between Portugal and Estonia are the oposite! They are also more visible, with Portugal preferring longer 
+          sequences constrained by the 4 degree bounds. We could interpret this as portugal showing on average longer periods without larger than 4 degree shifts, thus more stabile 
+          temperature in general. This is why both thresholding methods hold valuable information. 
+          
+          <br><br>
+
+          The quantile approach describes stability in terms of relative extremes. The fixed threshold describes stability in terms of a specific temperature value, without regard to 
+          the baseline. In terms of temperature persistence we observe then that Portugal has more persistent wether, while in the context of their geographic regions, the differences are
+          not so grand, perhaps even the oposite. Going any further in interpretation and analysis requires however different tools and more specific climatological expertice. 
+          
+        </p>
 
       <h3>Walkthrough crawler code:</h3>
 
