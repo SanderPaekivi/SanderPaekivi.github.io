@@ -940,9 +940,6 @@ def constrainedSubarrayHist(A, limit):
                           print('\n')
           
               res = max(res, j - i + 1) #checks old count vs new count of units between conditions
-              ### We could also save all the segments that were foudn and their lengths, their indexes. Right now, all that is needed
-              ### however is the longest segment length, however here we can extract all other relevant information, perhaps by 
-              ### constraining that only keep res info when j>i so that one-lengths are omitted. 
           
         </code>
       </pre>
