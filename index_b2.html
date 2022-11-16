@@ -15,6 +15,29 @@
 
 </head>
 
+<!-- Script and style for numbering from: https://www.dbaplus.ca/2021/11/javascriptcss-add-line-number-to-html.html -->
+<script type="text/javascript"> 
+  window.addEventListener("load", function () {
+    var codes = document.getElementsByClassName("dpw-code");
+    for (var i = 0; i < codes.length; i++) {
+        lineToSpan(codes[i]);
+    }
+  }, false);
+  function lineToSpan (code) {
+    var lines = code.innerHTML.split("\n");
+    while(code.childNodes.length > 0) {
+        code.removeChild(code.childNodes[0]);
+    }
+    for(var i = 0; i < lines.length; i++) {
+        var span = document.createElement("span");
+        span.className = "line";
+        span.innerHTML = lines[i];
+        code.appendChild(span);
+        code.appendChild(document.createTextNode("\n"));
+    }
+  };
+</script>
+
 <body>
 <main>
 
@@ -117,8 +140,7 @@ persistence in time-series</b>
           
           </p>  
           <p style="text-align:justify; "> 
-          <pre class="line-numbers">
-            <code class="language-css">
+          <pre class="dpw-code">
 def longestSubarray(A, limit):
   import heapq
   maxq, minq = [], []
@@ -131,9 +153,7 @@ def longestSubarray(A, limit):
           while maxq[0][1] < i: heapq.heappop(maxq)
           while minq[0][1] < i: heapq.heappop(minq)
       res = max(res, j - i + 1)
-  return res
-            </code>
-          </pre>
+  return res</pre>
         </p>
         <p style="text-align:left; "> 
 
@@ -189,8 +209,7 @@ def longestSubarray(A, limit):
 
         </p>
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 Starting with list of: [9, 1, 2, 7, 3, 8, 7, 10]
 
 
@@ -216,11 +235,7 @@ Current maxheap is:
 Current minheap is: 
 
                           [9, 0]                           
-------------------------------------------------------------
-
-
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:left; "> 
           We got the first number, 9, and threw it onto both the min- and max-heaps. Why the max-heap shows -9 is due to how it's being created, essentially negative numbers instead of positive,
@@ -232,8 +247,7 @@ Current minheap is:
           The crawlers left and right edge are both on the value 9. Next we crawl toward the value 1. 
         </p>  
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 --> Crawling forward RIGHT edge to position 1
 
 
@@ -258,9 +272,7 @@ Current minheap is:
 
                             [1, 1]                           
             [9, 0]            
-------------------------------------------------------------
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:left; "> 
           We see that both the heaps are taking form as intended - the second leaves are forming and keeping the ordered structure of the respective heaps. We know however, that the difference
@@ -268,8 +280,7 @@ Current minheap is:
           right edge cannot fix the criteria - the current values our caterpillar covers already exceed the criteria and will continue to do so. 
         </p>  
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 !!! Between positions 0 and 1 the threshold was exceeded: 9-1>3 !!!
 9  1  2  7  3  8  7 10
 i  j                  
@@ -286,16 +297,13 @@ Segment under question is:
 New maxheap is thus: 
 
                           [-1, 1]                           
-------------------------------------------------------------
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
         
         <p style="text-align:left; "> 
           One value with itself of course fulfills the difference condition, but let's keep crawling, maybe we will find a longer sequence than 1. 
         </p> 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 --> Crawling forward RIGHT edge to position 2
 
 
@@ -320,16 +328,13 @@ Current minheap is:
 
                             [1, 1]                           
             [9, 0]                        [2, 2]            
-------------------------------------------------------------
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:left; "> 
           Great! The new value, 2, gives us the first sequence longer than 1 that fulfills the criteria. Let's keep crawling.  
         </p> 
          
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 --> Crawling forward RIGHT edge to position 3
 
 
@@ -355,16 +360,13 @@ Current minheap is:
                             [1, 1]                           
             [7, 3]                        [2, 2]            
       [9, 0]    
-------------------------------------------------------------
-          </code>
-        </pre>     
+------------------------------------------------------------</pre>     
      
         <p style="text-align:left; "> 
           Looks like the new value, 7, breaks the criteria again. We still remember that the longest array we found thus far was 2, but could not increase it to 3. 
         </p> 
      
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 !!! Between positions 1 and 3 the threshold was exceeded: 7-1>3 !!!
 9  1  2  7  3  8  7 10
       i     j            
@@ -382,17 +384,14 @@ New minheap is thus:
 
                           [2, 2]                           
             [7, 3]                        [9, 0]            
-------------------------------------------------------------
-          </code>
-        </pre>     
+------------------------------------------------------------</pre>     
      
         <p style="text-align:left; "> 
           While we pulled the left edge forward, it still does not yield a sequence that fulfills the criteria, so we keep crawling until. For now, this will result in both left and right edges being on the same
           position again, and then crawling forward. 
         </p> 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 !!! Between positions 2 and 3 the threshold was exceeded: 7-2>3 !!!
 9  1  2  7  3  8  7 10
       i  j            
@@ -410,9 +409,7 @@ New minheap is thus:
 
                           [7, 3]                           
             [9, 0]            
-------------------------------------------------------------
-          </code>
-        </pre>     
+------------------------------------------------------------</pre>     
 
         <p style="text-align:left; "> 
           I'd like to point out that we have now seen two cases, where the algorithm pops values from heaps. The purpose of this is to move along the LEFT hand side of the crawler, before
@@ -424,8 +421,7 @@ New minheap is thus:
           Let's continue crawling.
         </p> 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 --> Crawling forward RIGHT edge to position 4
 
 
@@ -473,16 +469,13 @@ New maxheap is thus:
 
                           [-3, 4]                           
             [-1, 1]                       [-2, 2]            
-------------------------------------------------------------
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:left; "> 
           Continuing on... 
         </p> 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 --> Crawling forward RIGHT edge to position 5
 
 
@@ -531,9 +524,7 @@ New minheap is thus:
 
                             [7, 3]                           
             [8, 5]                        [9, 0]            
-------------------------------------------------------------
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:left; "> 
           Now something interesting happened. We use removal of a heaps root element, or popping, to crawl the LEFT edge along, whichever heap that might currently be. So it's not too 
@@ -546,8 +537,7 @@ New minheap is thus:
           No problem! Just keep popping until the match up, then crawl further right! That's why the algorithm is written with a while statement!
         </p> 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 Position of minheap root is still less than i, continuing to pop (tail not following yet!)
 
 * Popped 7 from minheap
@@ -559,17 +549,13 @@ New minheap is thus:
 
                             [8, 5]                           
             [9, 0]            
-------------------------------------------------------------
-
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:justify; "> 
           Moving along, we can simply observe the sequence and see visually that the threshold will not be broken, however one last interesting thing happens
         </p> 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code-noNr">
 --> Crawling forward RIGHT edge to position 6
 
 
@@ -626,9 +612,7 @@ Current minheap is:
                             [7, 6]                           
             [9, 0]                        [8, 5]            
     [10, 7]    
-------------------------------------------------------------
-          </code>
-        </pre>
+------------------------------------------------------------</pre>
 
         <p style="text-align:left; "> 
           Note that in the end, the sequence under question is 8,7,10. The maximum value is 10 as is the right edge of the sequence, but the minimum is 7, while the left edge is on 8. 
@@ -671,8 +655,7 @@ Current minheap is:
         </p>
           
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code">
 def constrainedSubarrayHist(A, limit):
     import heapq
     len_dict = {}
@@ -698,9 +681,7 @@ def constrainedSubarrayHist(A, limit):
     elif res > 1:
       len_dict[res] = 1
       res = 0
-    return len_dict                             
-          </code>
-        </pre>
+    return len_dict</pre>
 
         <p style="text-align:left; ">
         
@@ -762,9 +743,7 @@ def constrainedSubarrayHist(A, limit):
 
       <h3>Walkthrough crawler code:</h3>
 
-      <pre class="line-numbers">
-        <code class="language-css">
-
+      <pre class="dpw-code">
           ##############################
           ### Tree drawing function! ###
           ##############################
@@ -810,10 +789,13 @@ def constrainedSubarrayHist(A, limit):
           #2) draws the current tree structure for min and max heaps 
           #3) shows the original sequence with two lines aligned underneath - 
           #3.1) first is one with "ij" indexing, showing the current segment being tested. 
-          #3.2) second is the current root elements of the min and max heaps (denoted - and + respectively) which serve as the basis for testing our condition. 
-          #Observe the numbers added to the heap, the segment under question changing, then see if it fulfills the criteria by inspection. 
+          #3.2) second is the current root elements of the min and max heaps (denoted - and + respectively) 
+          #     which serve as the basis for testing our condition. 
+          #Observe the numbers added to the heap, the segment under question changing, 
+          #     then see if it fulfills the criteria by inspection. 
           #The crawling happens by moving both maximums and minimums, the roots of the respective heaps. This means that which is 
-          #the LEFT or RIGHT edge of the segment CHANGES, and the heaps keep track of it - they are visualised under the segment printouts as + and -. 
+          #the LEFT or RIGHT edge of the segment CHANGES, and the heaps keep track of it - 
+          #     they are visualised under the segment printouts as + and -. 
           
           res = i = 0
           for j, a in enumerate(A): 
@@ -864,7 +846,11 @@ def constrainedSubarrayHist(A, limit):
           
               while -maxq[0][0] - minq[0][0] > threshold:
                       print('\n')
-                      print('!!! Between positions ' + str(i) + ' and ' + str(j) + ' the threshold was exceeded: ' + str(-maxq[0][0]) + '-' + str(minq[0][0]) + '>' + str(threshold) + ' !!!')
+                      print(
+                        '!!! Between positions ' + str(i) + ' and ' + str(j) + ' the threshold was exceeded: ' + 
+                      str(-maxq[0][0]) + '-' + str(minq[0][0]) + '>' + str(threshold) + ' !!!'
+                      )
+                      
                       for row in table_data:
                         print(' '.join(['{:>2}' for i in range(0,len(A))]).format(*row))
                       print('Now we pop all values from heap whose root is left hand side of the segment!')
@@ -949,10 +935,7 @@ def constrainedSubarrayHist(A, limit):
                           print('\n')
                           print('\n')
           
-              res = max(res, j - i + 1) #checks old count vs new count of units between conditions
-          
-        </code>
-      </pre>
+              res = max(res, j - i + 1) #checks old count vs new count of units between conditions</pre>
           
 
 
