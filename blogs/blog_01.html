@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-  <link rel="stylesheet" href="styles.css" type="text/css" >
+  <link rel="stylesheet" href="../styles.css" type="text/css" >
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <title> Implementing the Kalman Filter for adaptive autoregression </title>
@@ -14,6 +14,29 @@
   <!-- <script type="text/javascript" src="latexmath.js"></script> -->
 
 </head>
+
+<!-- Script and style for numbering from: https://www.dbaplus.ca/2021/11/javascriptcss-add-line-number-to-html.html -->
+<script type="text/javascript"> 
+  window.addEventListener("load", function () {
+    var codes = document.getElementsByClassName("dpw-code");
+    for (var i = 0; i < codes.length; i++) {
+        lineToSpan(codes[i]);
+    }
+  }, false);
+  function lineToSpan (code) {
+    var lines = code.innerHTML.split("\n");
+    while(code.childNodes.length > 0) {
+        code.removeChild(code.childNodes[0]);
+    }
+    for(var i = 0; i < lines.length; i++) {
+        var span = document.createElement("span");
+        span.className = "line";
+        span.innerHTML = lines[i];
+        code.appendChild(span);
+        code.appendChild(document.createTextNode("\n"));
+    }
+  };
+</script>
 
 <body>
 <main>
@@ -593,8 +616,7 @@ for adaptive autoregression</b>
         I've included comments in the code to certain scientific paper that discuss an implementation such as this - their citations are given below the snippet. 
 
 
-        <pre class="line-numbers">
-          <code class="language-css">
+        <pre class="dpw-code">
             def kalman_var(data_in, order, lamda = 0.03): #The lambda parameter is set to 0.03 by default, since that is what many use, citing efficiency (see Milde 2010)
 
               import numpy as np
@@ -705,11 +727,7 @@ for adaptive autoregression</b>
                   for h in range(0,m):
                       Yhat[h,i] = np.dot(H[h], Xhatplus)
 
-              return Yhat, Xhatstorage, Errorstorage, Rstorage, Pstorage
-
-
-          </code>
-        </pre>
+              return Yhat, Xhatstorage, Errorstorage, Rstorage, Pstorage</pre>
 
         Relevant citations:
         <br>
