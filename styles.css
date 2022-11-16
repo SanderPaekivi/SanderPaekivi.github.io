@@ -191,10 +191,15 @@ padding-top: 102px;
 
 /* ------------------------ Code segments ------------------------------------------*/
 
-.line-numbers {
-    border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto; border-radius: 25px;
-    
-    counter-reset: line;
+.list-of-content {
+    height:50px; 
+    border:1px solid #ccc;
+    font:16px/26px Georgia, Garamond, Serif;
+    overflow:auto; 
+    border-radius: 25px;
+    padding: 10px; 
+    padding-left: 50px;
+    box-shadow: 5px 5px 5px #aaaaaa inset; 
 }
 
 
@@ -203,7 +208,6 @@ padding-top: 102px;
     /*word-break: break-all;*/
     overflow: auto;
     counter-reset: linecounter; /* Create line counter variable */
-
     border-width: 1px;
     border-style: solid;
     border-color: #c4d1e6;
