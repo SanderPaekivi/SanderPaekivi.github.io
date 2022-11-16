@@ -70,7 +70,7 @@ persistence in time-series</b>
       </p>  
 
       <h3>Heap datastructure:</h3>
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           
           I refer the reader to the in depth documentation on heaps by <a href="https://www.geeksforgeeks.org/heap-data-structure/" target="_blank">GeeksForGeeks</a>, but in brief - it is an
           ordered binary tree, starting with either the largest (called a max-heap) or smallest (called a min-heap) element, and splitting leaves in two, placing descending or ascending values
@@ -82,7 +82,7 @@ persistence in time-series</b>
           <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="https://www.geeksforgeeks.org/wp-content/uploads/MinHeapAndMaxHeap.png" alt="Picture of a heap!">
         </div>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
         
         In the above image, the min-heap is built from the numbers [10,15,30,40,40,50,100]. The heap is built one by one, as in the numbers are thrown on to a heap, and some rules govern
         what the heap will then look like. A min-heap would be something where the heavier things (larger numbers) roll deeper, building the bottom of the heap and the lighter things stay on top. 
@@ -109,7 +109,7 @@ persistence in time-series</b>
         </p>
 
       <h3>Heap algorithm for finding the longest continuous subsequence with absolute difference less than or equal to limit:</h3>
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
 
           The algorithm I'm looking at here is from the LeetCode website, the top voted (at the time of inspection, 11.22) <a href="https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/discuss/609771/JavaC%2B%2BPython-Deques-O%F0%9F%91%8E" target="_blank">solution</a>
           to the problem stated as the paragraphs title. 
@@ -135,7 +135,7 @@ def longestSubarray(A, limit):
             </code>
           </pre>
         </p>
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
 
           Considering that we could of course brute-force the problem with nested loops (oh lord), this is such an elegant solution that I just got interested, how it works. 
           I found it to be useful to understand it in multiple ways - a new way of looking at the problem, deeper understanding of how heaps can help, and also practical 
@@ -158,7 +158,7 @@ def longestSubarray(A, limit):
 
         </p>
       <h3>Step-by-step through heaps:</h3>
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
 
           Let's consider the sequence: [9, 1, 2, 7, 3, 8, 7, 10]
 
@@ -222,7 +222,7 @@ Current minheap is:
           </code>
         </pre>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           We got the first number, 9, and threw it onto both the min- and max-heaps. Why the max-heap shows -9 is due to how it's being created, essentially negative numbers instead of positive,
           thus ordering the structure in reverse to the min-heap (default). Also, note that we keep the heaps ordered by the size of the value, but we also include it's position in the main sequence.
           This is important to compare against the left edge of the crawlers position. 
@@ -262,7 +262,7 @@ Current minheap is:
           </code>
         </pre>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           We see that both the heaps are taking form as intended - the second leaves are forming and keeping the ordered structure of the respective heaps. We know however, that the difference
           between 9 and 1 is greater than 3, our chosen threshold. Thus, we need to move the caterpillar - by removing values from either heap, that are LEFT of the new value, as any further extension of the 
           right edge cannot fix the criteria - the current values our caterpillar covers already exceed the criteria and will continue to do so. 
@@ -290,7 +290,7 @@ New maxheap is thus:
           </code>
         </pre>
         
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           One value with itself of course fulfills the difference condition, but let's keep crawling, maybe we will find a longer sequence than 1. 
         </p> 
 
@@ -324,7 +324,7 @@ Current minheap is:
           </code>
         </pre>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           Great! The new value, 2, gives us the first sequence longer than 1 that fulfills the criteria. Let's keep crawling.  
         </p> 
          
@@ -359,7 +359,7 @@ Current minheap is:
           </code>
         </pre>     
      
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           Looks like the new value, 7, breaks the criteria again. We still remember that the longest array we found thus far was 2, but could not increase it to 3. 
         </p> 
      
@@ -386,7 +386,7 @@ New minheap is thus:
           </code>
         </pre>     
      
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           While we pulled the left edge forward, it still does not yield a sequence that fulfills the criteria, so we keep crawling until. For now, this will result in both left and right edges being on the same
           position again, and then crawling forward. 
         </p> 
@@ -414,7 +414,7 @@ New minheap is thus:
           </code>
         </pre>     
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           I'd like to point out that we have now seen two cases, where the algorithm pops values from heaps. The purpose of this is to move along the LEFT hand side of the crawler, before
           continuing to crawl rightward. But notice that WHICH heap do we pop values from of course depends on which heap represents the LEFT edge - in the very first two steps of the process, 
           we popped from the max-heap, but here from the min-heap. This is why we also write out here not only the positions of left and right side, but in which heap they are the root in!
@@ -477,7 +477,7 @@ New maxheap is thus:
           </code>
         </pre>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           Continuing on... 
         </p> 
 
@@ -535,7 +535,7 @@ New minheap is thus:
           </code>
         </pre>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           Now something interesting happened. We use removal of a heaps root element, or popping, to crawl the LEFT edge along, whichever heap that might currently be. So it's not too 
           hard to see, that at some point, there might be some confusion in which extreme value is in which spot, and where are they in relation to each other in the heaps... This is what happened here.
           We popped the previous left edge, the value 3 from the min-heap. This caused however the new root to become a value from further away, 7! The edges of our crawler are on the value 8, but the 
@@ -630,14 +630,14 @@ Current minheap is:
           </code>
         </pre>
 
-        <p style="text-align:justify; "> 
+        <p style="text-align:left; "> 
           Note that in the end, the sequence under question is 8,7,10. The maximum value is 10 as is the right edge of the sequence, but the minimum is 7, while the left edge is on 8. 
           This is why the left edge in the algorithm is constructed separately, and only adjusted as the minimum of both heaps roots if the criteria breaks.   
         </p> 
      
       <h3>Persistence in sequences and criteria fulfilling subsequences - related?</h3>
 
-      <p style="text-align:justify; "> 
+      <p style="text-align:left; "> 
 
         The idea of tracking the lengths of subsequences fulfilling some condition relating to extremes is quite interesting. This touches upon the concept of "persistence", or how likely are things
         to stay the way they currently are. The matter of "how things currently are" is not so simple itself, so having some error bounds can help... the criteria.. but when things change beyond
@@ -702,7 +702,7 @@ def constrainedSubarrayHist(A, limit):
           </code>
         </pre>
 
-        <p style="text-align:justify; ">
+        <p style="text-align:left; ">
         
         We now need a method to choose a threshold, as we want the results for Estonia and Portugal to be comparable. One approach is to calculate the differences sequence, and choose 
         a quantile. That is to say, we choose the threshold magnitude to be such that a certain percentage of the differences are less than this value, thus tuning the "how extreme" meaning
@@ -726,7 +726,7 @@ def constrainedSubarrayHist(A, limit):
           <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="b2_histogram.png" alt="Histogram of extreme bounded sequence lengths.">
         </div>
 
-        <p style="text-align:justify; ">
+        <p style="text-align:left; ">
         
           We notice a cacophony of differences and overlaps between the two histograms. It's unclear if there are different temperature persistence patterns at play, perhaps they are simply offset 
           from each other, or the quantile level is not optimal to reflect a "typical extreme" threshold (seemed like the best I could cursory find at the time at least). If this graph is to
@@ -745,7 +745,7 @@ def constrainedSubarrayHist(A, limit):
           <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="b2_histogram_v2.png" alt="Histogram of extreme bounded sequence lengths.">
         </div>
 
-        <p style="text-align:justify; ">
+        <p style="text-align:left; ">
 
           It turns out, that for a fixed temperature threshold, the differences between Portugal and Estonia are the opposite! They are also more visible, with Portugal preferring longer 
           sequences constrained by the 6 degree bounds. We could interpret this as Portugal showing on average longer periods without larger than 6 degree shifts, thus more stabile 
