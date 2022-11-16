@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css" type="text/css" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <title> Visualising persistence in time-series data </title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <!-- <script type="text/javascript" src="latexmath.js"></script> -->
+
+</head>
+
+<body>
+<main>
+
+  
+<div class="site-header"> 
+  
+  <div class="header-cont" style="font-family: 'Didact Gothic'; font-size: 20px; margin-right: 25px;"> 
+    <b style="white-space: pre;">Visualising persistence
+in time-series data</b>
+  </div>
+
+  <div class="header-cont">   
+    <!---->
+
+
+  <div>
+    <a href="https://sanderpaekivi.github.io/index.html" target="_blank" style="text-decoration: none;">
+      <b style="color: white; font-family: 'Open Sans'; font-size: 30px; "> Home </b> 
+    </a> 
+  </div>
+  
+
+
+    <!---->
+  </div>
+
+</div>
+
+<div class="content" style="margin-top: 0 ; margin-bottom: 0 ;">
+
+      <h3>Introduction:</h3>
+      <p style="text-align:justify; "> 
+
+        I revently happened upon an interesting problem: in a sequence, find the longes subsequence, for which the maximal difference does not cross a threshold. It seems like a very specific issue, 
+        but turns out to be quite a common test-asignment to gauge the applicants skill in programming. From a physics point of view, it has some other interesting applications. For example - finding subsequences 
+        that form characteristic regimes - fluctuating in between bounds set by the maximum difference. I'll demonstrate the specific later, but first to the point of the post! 
+        <br><br>
+
+        The point of this post is not the applications of the stated problem, but the inner workings of a very clever solution to it, using "heap" datastructures! 
+        
+        <br><br>
+        
+        The post is structured as follows: 
+        
+        <ol>
+          <li>An overview of the heap datastructure</li>
+          <li>An overview of the algorithm </li>
+          <li>A step-by-step walkthrough of the algorithm </li>
+          <li>Application to visualizing persistence in time-series</li>
+          <li>Closing remarks and relevant citations </li>
+        </ol>  
+
+      </p>  
+
+      <h3>Heap datastructure:</h3>
+        <p style="text-align:justify; "> 
+          
+          I refer the reader to the in depth article on heaps by <a href="https://www.geeksforgeeks.org/heap-data-structure/" target="_blank">GeeksForGeeks</a>, but in brief - it is an
+          ordered binary tree, starting with either the largest (called a max-heap) or smallest (called a min-heap) element, and splitting leaves in two, placing descending or ascending values
+          on them respectively. 
+
+        </p>
+
+        <div style="text-align:center" >
+          <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="https://www.geeksforgeeks.org/wp-content/uploads/MinHeapAndMaxHeap.png" alt="Picture of a heap!">
+        </div>
+
+        <p style="text-align:justify; "> 
+        
+        In the above image, the min-heap is built from the numbers [10,15,30,40,40,50,100]. The heap is built one by one, as in the numbers are thrown on to a heap, and some rules govern
+        what the heap will then look like. A min-heap would be something where the heavier things (larger numbers) roll deeper, building the bottom of the heap and the ligher things stay on top. 
+        We don't know exactly what the sequence that this example heap was made of looked like, but we can propose one that would give rise to such a min-heap and learn intuitively what is happening. 
+        For example, the sequence [40, 10, 30, 15, 50, 100, 40 ].
+
+        <br><br>
+
+        We start with 40, this will become the root node at first. Next we add underneath the root the number 10. We see that this is "lighter", so we swap their positions, keeping 10 as the root
+        and 40 as its first leaf. Next comes in the value 30, which is "heavier" than 10, and since we have two brances from the root, we have space for it next to 40. The rules are sattisfied,
+        as the root is the smallest, and it brances into two leaves, whose values must be larger. 
+        
+        <br><br>
+
+        Next comes 15. We start from the leftmost new leaf, the newly branched into two number 40. 15 is "lighter" than 40, so we spaw their places. We further check, if 15 is lighter than the root.
+        It is not, so things remains as such, with the leftmost branch structure following 10, 15, 40. After this we get 50, adding it to the remaining free leaf next to 40, and similarly for 100 and 40, as they
+        do not call for swapping positions in leaf layers, and we just need them to be larger than their parent leaf! 
+        
+        <br><br>
+
+        Other initial sequences could have also given such a result, so it's not reversible, the process of heaping, but that's okay. It serves other purposes. Mainly - the smallest (or largest)
+        value is kept at an easily accessible position AND comparisons between other elements can be easily made by leaf layers, based on magnitude. Let's put it to use. 
+         
+        </p>
+
+      <h3>Heap algorithm for finding the longest continuous subsequence with absolute difference less than or equal to limit:</h3>
+        <p style="text-align:justify; "> 
+
+          The algorithm I'm looking at here is from the LeetCode website, the top voted (at the time of inspection, 11.22) <a href="https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/discuss/609771/JavaC%2B%2BPython-Deques-O%F0%9F%91%8E" target="_blank">solution</a>
+          to the problem stated as the paragraphs title. 
+
+          
+          </p>  
+          <p style="text-align:justify; "> 
+          <pre class="line-numbers">
+            <code class="language-css">
+def longestSubarray(A, limit):
+  import heapq
+  maxq, minq = [], []
+  res = i = 0
+  for j, a in enumerate(A):
+      heapq.heappush(maxq, [-a, j])
+      heapq.heappush(minq, [a, j])
+      while -maxq[0][0] - minq[0][0] > limit:
+          i = min(maxq[0][1], minq[0][1]) + 1
+          while maxq[0][1] < i: heapq.heappop(maxq)
+          while minq[0][1] < i: heapq.heappop(minq)
+      res = max(res, j - i + 1)
+  return res
+            </code>
+          </pre>
+        </p>
+        <p style="text-align:justify; "> 
+
+          Considering that we could of course brute-force the problem with nested loops (oh lord), this is such an elegant solution that I just got interested, how it works. 
+          I found it to be useful to understand it in multiple ways - a new way of looking at the problem, deeper understanding of how heaps can help, and also practical 
+          applications of this relatively simple problem!
+          
+          <br><br>
+
+          If given the sequence [1,2,4,3,5,8,9,7,8], and asked to find the longest subsequence where the absolute difference does not exceed say, 2, then this algorithm would very 
+          quickly tell you the answer is: 4. Because the algorithm tells you the "length" of the longest subsequence, that fulfills this condition. Not what it is or where (easy additions if we want this knowledge tho).
+          By the way, the sequence is the last 4 numbers: 8,9,7,9. An difference between them will be less or equal to two. 
+
+          <br><br><br>
+
+          To understand what is going on, I rewrote this algorithm to print out it's steps in a visual manner. We will now go through it for an example sequence, discuss why what is happening
+          is important, and that's that really...  
+          
+          
+          
+
+
+        </p>
+      <h3>Step-by-step through heaps:</h3>
+        <p style="text-align:justify; "> 
+
+          Let's consider the sequence: [9, 1, 2, 7, 3, 8, 7, 10]
+
+          <br><br>
+
+          We start with the leftmost element and throw values on to the heap sequentially, visualize what's happening and talk it through. Remember, what we want is to find a continuous subsequence
+          for which any value, subtracted from another, is not greater than some threshold, say 3 in this case. So we could test all possible lengths of subarrays, starting from all possible 
+          values, something like: (9,1), (9,1,2), ..., (1,2), (1,2,7), (1,2,7,3), ..., (8,7,10), (7,10). Then we test all these sequence with something like the maximum minus the minimum of the subsequence and find the 
+          longest one that is under or equal to the threshold. This is computationally very slow. What would be better is if we had something of a crawler, that crawls across our sequence, keeping 
+          track of possible subsequences it has found. That's actually what the heap-based algorithm above does. 
+
+          <br><br>
+
+          In fact, the two heaps that are built simultaneously, min- and max-heaps, they operate as the left and right edge of this crawler. Immagine a caterpillar crawling over a bumpy 
+          landscape, where the heights of the bumps are representative of the value of the numbers (just a plot of the sequence with the x-axis being the position in sequence). This caterpillar 
+          will strech and shrink, moving along, keeping in mind where it had to make large step (breaking the threshold criteria) and where it could comfortably crawl along. Notice that the 
+          code has ".heappop" involved, that removes the root-element from the heap. This is representative of either the left or right end of the caterpillar moving forward, "leaving it's old position, replacing it with a new position", like 
+          in the swapping procedure in ordering the heap. Let's just get into it and it will hopefully be more clear.  
+          
+          <br><br>
+
+          In the below walkthrough, in every step I'll write out the sequence, and mark the current LEFT and RIGHT edge of the crawler with "i" and "j". I'll also mark the position of the 
+          current SMALLEST element with a - and the LARGEST one with a +. In case they are the same, i'll mark an X. 
+
+          <br><br>
+
+          We'll be using the threshold of 3 here, that is: only sequences where the max(sequence)-min(sequence)<=3. 
+
+        </p>
+
+        <pre class="line-numbers">
+          <code class="language-css">
+Starting with list of: [9, 1, 2, 7, 3, 8, 7, 10]
+
+
+--> Crawling forward RIGHT edge to position 0
+
+
+segment under question:
+9  1  2  7  3  8  7 10
+ij                     
+x                     
+
+
+--> Pushed -9 to maxheap
+--> Pushed 9 to minheap
+
+
+Current maxheap is: 
+
+                          [-9, 0]                           
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                          [9, 0]                           
+------------------------------------------------------------
+
+
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          We got the first number, 9, and threw it onto both the min- and max-heaps. Why the max-heap shows -9 is due to how it's being created, essentially negative numbers instead of positive,
+          thus ordering the structure in reverse to the min-heap (default). Also, note that we keep the heaps ordered by the size of the value, but we also include it's position in the main sequence.
+          This is important to compare against the left edge of the crawlers position. 
+          
+          <br><br>
+
+          The crawlers left and right edge are both on the value 9. Next we crawl toward the value 1. 
+        </p>  
+
+        <pre class="line-numbers">
+          <code class="language-css">
+--> Crawling forward RIGHT edge to position 1
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+  i  j                  
+  +  -                  
+
+
+--> Pushed -1 to maxheap
+--> Pushed 1 to minheap
+
+
+Current maxheap is: 
+
+                          [-9, 0]                           
+            [-1, 1]            
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [1, 1]                           
+            [9, 0]            
+------------------------------------------------------------
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          We see that both the heaps are taking form as intended - the second leaves are forming and keeping the ordered structure of the respective heaps. We know however, that the difference
+          between 9 and 1 is greater than 3, our chosen threshold. Thus, we need to move the caterpiller - by removing values from either heap, that are LEFT of the new value, as any further extension of the 
+          right edge cannot fix the criteria - the current values our caterpiller covers already exceed the criteria and will continue to do so. 
+        </p>  
+
+        <pre class="line-numbers">
+          <code class="language-css">
+!!! Between positions 0 and 1 the threshold was exceeded: 9-1>3 !!!
+9  1  2  7  3  8  7 10
+i  j                  
++  -                  
+Now we pop all values from heap whose root is left hand side of the segment!
+
+
+--> Crawling forward LEFT edge to 1 by popping all less than.
+* Popped -9 from maxheap
+Segment under question is:
+9  1  2  7  3  8  7 10
+  ij                  
+    x                  
+New maxheap is thus: 
+
+                          [-1, 1]                           
+------------------------------------------------------------
+          </code>
+        </pre>
+        
+        <p style="text-align:justify; "> 
+          One value with itself of course fulfills the difference condition, but let's keep crawling, maybe we will find a longer sequence than 1. 
+        </p> 
+
+        <pre class="line-numbers">
+          <code class="language-css">
+--> Crawling forward RIGHT edge to position 2
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+    i  j               
+    -  +               
+
+
+--> Pushed -2 to maxheap
+--> Pushed 2 to minheap
+
+
+Current maxheap is: 
+
+                          [-2, 2]                           
+            [-1, 1]            
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [1, 1]                           
+            [9, 0]                        [2, 2]            
+------------------------------------------------------------
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          Great! The new value, 2, gives us the first sequence longer than 1 that fulfills the criteria. Let's keep crawling.  
+        </p> 
+         
+        <pre class="line-numbers">
+          <code class="language-css">
+--> Crawling forward RIGHT edge to position 3
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+    i     j            
+    -     +            
+
+
+--> Pushed -7 to maxheap
+--> Pushed 7 to minheap
+
+
+Current maxheap is: 
+
+                          [-7, 3]                           
+            [-1, 1]                       [-2, 2]            
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [1, 1]                           
+            [7, 3]                        [2, 2]            
+      [9, 0]    
+------------------------------------------------------------
+          </code>
+        </pre>     
+     
+        <p style="text-align:justify; "> 
+          Looks like the new value, 7, breaks the criteria again. We still remember that the longest array we found thus far was 2, but could not increase it to 3. 
+        </p> 
+     
+        <pre class="line-numbers">
+          <code class="language-css">
+!!! Between positions 1 and 3 the threshold was exceeded: 7-1>3 !!!
+9  1  2  7  3  8  7 10
+    i     j            
+    -     +            
+Now we pop all values from heap whose root is left hand side of the segment!
+
+
+--> Crawling forward LEFT edge to 2 by popping all less than.
+* Popped 1 from minheap
+Segment under question is:
+9  1  2  7  3  8  7 10
+      i  j            
+      -  +            
+New minheap is thus: 
+
+                          [2, 2]                           
+            [7, 3]                        [9, 0]            
+------------------------------------------------------------
+          </code>
+        </pre>     
+     
+        <p style="text-align:justify; "> 
+          While we pulled the left edge forward, it still does not yield a sequence that fulfilles the criteria, so we keep crawling until. For now, this will result in both left and right edges being on the same
+          position again, and then crawling forward. 
+        </p> 
+
+        <pre class="line-numbers">
+          <code class="language-css">
+!!! Between positions 2 and 3 the threshold was exceeded: 7-2>3 !!!
+9  1  2  7  3  8  7 10
+      i  j            
+      -  +            
+Now we pop all values from heap whose root is left hand side of the segment!
+
+
+--> Crawling forward LEFT edge to 3 by popping all less than.
+* Popped 2 from minheap
+Segment under question is:
+9  1  2  7  3  8  7 10
+        ij            
+          x            
+New minheap is thus: 
+
+                          [7, 3]                           
+            [9, 0]            
+------------------------------------------------------------
+          </code>
+        </pre>     
+
+        <p style="text-align:justify; "> 
+          I'd like to point out that we have now seen two cases, where the algorithm pops values from heaps. The purpose of this is to move along the LEFT hand side of the crawler, before
+          continuing to crawl rightward. But notice that WHICH heap do we pop values from of course depends on which heap represents the LEFT edge - in the very first two steps of the process, 
+          we popped from the max-heap, but here from the min-heap. This is why we also write out here not only the positions of left and right side, but in which heap they are the root in!
+          
+          <br><br>
+
+          Let's continue crawling.
+        </p> 
+
+        <pre class="line-numbers">
+          <code class="language-css">
+--> Crawling forward RIGHT edge to position 4
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+          i  j         
+          +  -         
+
+
+--> Pushed -3 to maxheap
+--> Pushed 3 to minheap
+
+
+Current maxheap is: 
+
+                          [-7, 3]                           
+            [-3, 4]                       [-2, 2]            
+    [-1, 1]    
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [3, 4]                           
+            [9, 0]                        [7, 3]            
+------------------------------------------------------------
+
+
+
+
+!!! Between positions 3 and 4 the threshold was exceeded: 7-3>3 !!!
+  9  1  2  7  3  8  7 10
+          i  j         
+          +  -         
+Now we pop all values from heap whose root is left hand side of the segment!
+
+
+--> Crawling forward LEFT edge to 4 by popping all less than.
+* Popped -7 from maxheap
+Segment under question is:
+  9  1  2  7  3  8  7 10
+            ij         
+              x         
+New maxheap is thus: 
+
+                          [-3, 4]                           
+            [-1, 1]                       [-2, 2]            
+------------------------------------------------------------
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          Continuing on... 
+        </p> 
+
+        <pre class="line-numbers">
+          <code class="language-css">
+--> Crawling forward RIGHT edge to position 5
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+              i  j      
+              -  +      
+
+
+--> Pushed -8 to maxheap
+--> Pushed 8 to minheap
+
+
+Current maxheap is: 
+
+                          [-8, 5]                           
+            [-3, 4]                       [-2, 2]            
+    [-1, 1]    
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [3, 4]                           
+            [8, 5]                        [7, 3]            
+      [9, 0]    
+------------------------------------------------------------
+
+
+
+
+!!! Between positions 4 and 5 the threshold was exceeded: 8-3>3 !!!
+  9  1  2  7  3  8  7 10
+              i  j      
+              -  +      
+Now we pop all values from heap whose root is left hand side of the segment!
+
+
+--> Crawling forward LEFT edge to 5 by popping all less than.
+* Popped 3 from minheap
+Segment under question is:
+  9  1  2  7  3  8  7 10
+                ij      
+          -     +      
+New minheap is thus: 
+
+                            [7, 3]                           
+            [8, 5]                        [9, 0]            
+------------------------------------------------------------
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          Now something interesting happened. We use removal of a heaps root element, or popping, to crawl the LEFT edge along, whichever heap that might currently be. So it's not too 
+          hard to see, that at some point, there might be some confusion in which extreme value is in which spot, and where are they in relation to eachother in the heaps... This is what happened here.
+          We popped the previous left edge, the value 3 from the min-heap. This caused however the new root to become a value from further away, 7! The edges of our crawler are on the value 8, but the 
+          heaps keeping track of the magnitudes of these positions are mismatched.
+          
+          <br><br>
+
+          No problem! Just keep popping until the match up, then crawl further right! That's why the algorithm is wirtten with a while statement!
+        </p> 
+
+        <pre class="line-numbers">
+          <code class="language-css">
+Position of minheap root is still less than i, continuing to pop (tail not following yet!)
+
+* Popped 7 from minheap
+Segment under question is:
+  9  1  2  7  3  8  7 10
+                ij      
+                x      
+New minheap is thus: 
+
+                            [8, 5]                           
+            [9, 0]            
+------------------------------------------------------------
+
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          Moving along, we can simply observe the sequence and see visually that the threshold will not be broken, however one last interesting thing happens
+        </p> 
+
+        <pre class="line-numbers">
+          <code class="language-css">
+--> Crawling forward RIGHT edge to position 6
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+                i  j   
+                +  -   
+
+
+--> Pushed -7 to maxheap
+--> Pushed 7 to minheap
+
+
+Current maxheap is: 
+
+                          [-8, 5]                           
+            [-7, 6]                       [-2, 2]            
+    [-1, 1]        [-3, 4]    
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [7, 6]                           
+            [9, 0]                        [8, 5]            
+------------------------------------------------------------
+
+
+
+
+--> Crawling forward RIGHT edge to position 7
+
+
+segment under question:
+  9  1  2  7  3  8  7 10
+                i     j
+                    -  +
+
+
+--> Pushed -10 to maxheap
+--> Pushed 10 to minheap
+
+
+Current maxheap is: 
+
+                          [-10, 7]                          
+            [-7, 6]                       [-8, 5]            
+    [-1, 1]        [-3, 4]        [-2, 2]    
+------------------------------------------------------------
+
+
+Current minheap is: 
+
+                            [7, 6]                           
+            [9, 0]                        [8, 5]            
+    [10, 7]    
+------------------------------------------------------------
+          </code>
+        </pre>
+
+        <p style="text-align:justify; "> 
+          Note that in the end, the sequence under question is 8,7,10. The maximum value is 10 as is the right edge of the sequence, but the minimum is 7, while the left edge is on 8. 
+          This is why the left edge in the algorithm is constructed separately, and only adjusted as the minimum of both heaps roots if the criteria breaks.   
+        </p> 
+     
+      <h3>Keeping track of criteria filling lengths and positions - applications?</h3>
+
+      <p style="text-align:justify; "> 
+
+        The idea of tracking the lengths of subsequences fulfilling some condition relating to extremes is quite interesting. This touches upon the consept of "persistence", or how likely are things
+        to stay the way they currently are. The matter of "how things currently are" is not so simple itself, so having some error bounds can help... the criteria.. but when things change beyond
+        this criteria, they are not the same.. so how long did the previous "now" last and how long will the new "now" last? 
+        
+        <br><br>
+
+        Let me clarify things, by focusing in on my own background: time-series analysis. For example, air temperature - it changes daily, monthly, yearly.. it has trends and seasons. 
+        The temperature day-to-day however is different around the world, not only in magnitude but by the persistence of values. Since we are dealign with a stochastic phenomenon, we already 
+        expect some noize in a daily measure of temperature and thus not smooth changes, but we don't expect the temperature to change "too much" from day to day. While extreme shifts happen, 
+        they are rare by their nature.  
+
+        <br><br>
+
+        Turns out that this little heap-based algorithm is quite good for visualizing the relative rarity of persistence in time-series! Let me demonstrate on some real world data.
+
+        <br><br>
+
+        I'll be using the daily mean temperature data from the <a href="https://www.ecad.eu/" target="_blank">ECA-D</a>
+        website for Portugal (Lisboa Geofisica) and Estonia (Tallinn) and the period will be from 2000 to 2020 (ending on the last day of october). I'll deseason the data by subtracting the
+        day-of-year ensamble means and run through the resulting anomalies time-series with the crawler! This time however, i'll modify the crawler to keep track of the number of times it saw 
+        a sequence length fulfilling the criteria, thus yielding a dictionary of {Length:Count}. 
+      
+        </p>
+          
+
+        <pre class="line-numbers">
+          <code class="language-css">
+import heapq
+def constrainedSubarrayHist(A, limit):
+    len_dict = {}
+    maxq, minq = [], []
+    res = i = 0
+    for j, a in enumerate(A):
+        heapq.heappush(maxq, [-a, j])
+        heapq.heappush(minq, [a, j])
+        while -maxq[0][0] - minq[0][0] > limit:
+            i = min(maxq[0][1], minq[0][1]) + 1
+            while maxq[0][1] < i: heapq.heappop(maxq)
+            while minq[0][1] < i: heapq.heappop(minq)
+        res = (j - i + 1)
+        
+        if res in len_dict:
+          len_dict[res] += 1
+        else:
+            len_dict[res] = 1
+        
+    return len_dict            
+          </code>
+        </pre>
+
+        <p style="text-align:justify; ">
+        
+        We now need a method to choose a threshold, as we want the results for Estonia and Portugal to be comparable. One approach is to calculate the differences sequence, and choose 
+        a quantile. That is to say, we choose the threshold magnitud to be such that a certain percentage of the differences are less than this value, thus tuning the "how extreme" meaning
+        of the threshold. A higher quantile will most likely yield many counts for long segments compared to a lower quantile - because the latter is more common, thus breaking the criteria 
+        more oftan. 
+
+        <br><br>
+
+        Another way to define the threshold heuristically, deciding ourselves what constitutes "too large" of a change in the day to day temperature such that we would not consider the days 
+        to have had "roughly the same" temperature. That is a decent interpretation of the subarray problem. 
+        
+        <br><br>
+
+        I opt here for the quantile approach, as what constitutes a change from the norm in Estonia is probably not the same for Portugal, so the local 20 year based extremes should be more 
+        comparable. 
+
+
+        </p>
+        
+        <div style="text-align:center" >
+          <img style="border-radius: 2em; object-fit: cover; object-position: 0 0; width: 50%; " src="b2_histogram.png" alt="Histogram of extreme bounded sequence lengths.">
+        </div>
+
+
+
+      <h3>Walkthrough crawler code:</h3>
+
+      <pre class="line-numbers">
+        <code class="language-css">
+
+          ##############################
+          ### Tree drawing function! ###
+          ##############################
+
+          import math
+          from io import StringIO
+          
+          def show_tree(tree, total_width=60, fill=' '):
+              """Pretty-print a tree.
+              total_width depends on your input size"""
+              output = StringIO()
+              last_row = -1
+              for i, n in enumerate(tree):
+                  if i:
+                      row = int(math.floor(math.log(i+1, 2)))
+                  else:
+                      row = 0
+                  if row != last_row:
+                      output.write('\n')
+                  columns = 2**row
+                  col_width = int(math.floor((total_width * 1.0) / columns))
+                  output.write(str(n).center(col_width, fill))
+                  last_row = row
+              print (output.getvalue())
+              print ('-' * total_width)
+              return         
+
+          ########################
+          ### Main walkthrough ###
+          ########################
+
+          import heapq
+          maxq, minq = [], []
+          
+          A = [9,1,2,7,3,8,7,10]
+          
+          threshold = 3
+          print('Starting with list of: ' + str(A))
+          
+          #The printout is a step-by-step walkthrough of using heaps to find subsequences in a sequence which fulfill some constraint 
+          #relating to extrema, like having a maximum difference (the case here). The walkthrough does the following:
+          #1) prints out what number is pushed into the heaps
+          #2) draws the current tree structure for min and max heaps 
+          #3) shows the original sequence with two lines aligned underneath - 
+          #3.1) first is one with "ij" indexing, showing the current segment being tested. 
+          #3.2) second is the current root elements of the min and max heaps (denoted - and + respectively) which serve as the basis for testing our condition. 
+          #Observe the numbers added to the heap, the segment under question changing, then see if it fulfills the criteria by inspection. 
+          #The crawling happens by moving both maximums and minimums, the roots of the respective heaps. This means that which is 
+          #the LEFT or RIGHT edge of the segment CHANGES, and the heaps keep track of it - they are visualised under the segment printouts as + and -. 
+          
+          res = i = 0
+          for j, a in enumerate(A): 
+              ### j is enumerator and keeps track of RIGHT side of the segment under question.
+              print('\n')
+              print('--> Crawling forward RIGHT edge to position ' + str(j))
+          
+              heapq.heappush(maxq, [-a, j])
+              heapq.heappush(minq, [a, j])
+          
+              print('\n')
+              print('segment under question:')
+              B = [ '' for i in A ]
+              C = [ '' for i in A ]
+              B[i] = 'i'
+              B[j] = 'j'
+              if i==j:
+                B[j]='ij'
+              C[maxq[0][1]] = '+'
+              C[minq[0][1]] = '-'
+              if minq[0][1]==maxq[0][1]:
+                C[minq[0][1]]='x'
+              table_data = [
+                  A,
+                  B,
+                  C,
+                ]
+              for row in table_data:
+                  print(' '.join(['{:>2}' for i in range(0,len(A))]).format(*row))
+          
+              
+              print('\n')
+              print('--> Pushed ' + str(-a) + ' to maxheap') 
+              print('--> Pushed ' + str(a) + ' to minheap') 
+          
+              ######################################################################
+              
+              print('\n')
+              print('Current maxheap is: ')
+              show_tree(maxq)
+              print('\n')
+              print('Current minheap is: ')
+              show_tree(minq)
+          
+              ######################################################################
+          
+              condition = -maxq[0][0] - minq[0][0] > threshold
+          
+              while -maxq[0][0] - minq[0][0] > threshold:
+                      print('\n')
+                      print('!!! Between positions ' + str(i) + ' and ' + str(j) + ' the threshold was exceeded: ' + str(-maxq[0][0]) + '-' + str(minq[0][0]) + '>' + str(threshold) + ' !!!')
+                      for row in table_data:
+                        print(' '.join(['{:>2}' for i in range(0,len(A))]).format(*row))
+                      print('Now we pop all values from heap whose root is left hand side of the segment!')
+                      
+                      ######################################################################
+          
+                      i = min(maxq[0][1], minq[0][1]) + 1  
+                      ### i keeps track of the LEFT edge of the segment under observation!
+                      print('\n')
+                      print('--> Crawling forward LEFT edge to ' + str(i) + ' by popping all less than.')
+                      
+                      ######################################################################
+                      
+                      while maxq[0][1] < i: 
+          
+                        print('* Popped ' + str(maxq[0][0]) + ' from maxheap')
+                        heapq.heappop(maxq)
+          
+                        ######################################################################
+          
+                        print('Segment under question is:')
+                        B = [ '' for i in A ]
+                        C = [ '' for i in A ]
+                        B[i] = 'i'
+                        B[j] = 'j'
+                        if i==j:
+                          B[j]='ij'
+                        C[maxq[0][1]] = '+'
+                        C[minq[0][1]] = '-'
+                        if maxq[0][1]==minq[0][1]:
+                          C[maxq[0][1]]='x'
+                        table_data = [
+                            A,
+                            B,
+                            C
+                          ]
+                        for row in table_data:
+                            print(' '.join(['{:>2}' for i in range(0,len(A))]).format(*row))
+                                            
+                        ######################################################################
+          
+                        print('New maxheap is thus: ')
+                        show_tree(maxq)
+                        if maxq[0][1] < i:
+                          print('Position of maxheap root is still less than i, continuing to pop (tail not following yet!)')
+                          print('\n')
+                          print('\n')
+                      
+                      while minq[0][1] < i: 
+                        
+                        
+                        print('* Popped ' + str(minq[0][0]) + ' from minheap')
+                        heapq.heappop(minq)
+          
+                        ######################################################################
+          
+                        print('Segment under question is:')
+                        B = [ '' for i in A ]
+                        C = [ '' for i in A ]
+                        B[i] = 'i'
+                        B[j] = 'j'
+                        if i==j:
+                          B[j]='ij'
+                        C[maxq[0][1]] = '+'
+                        C[minq[0][1]] = '-'
+                        if minq[0][1]==maxq[0][1]:
+                          C[minq[0][1]]='x'
+                        table_data = [
+                            A,
+                            B,
+                            C
+                          ]
+                        for row in table_data:
+                            print(' '.join(['{:>2}' for i in range(0,len(A))]).format(*row))
+          
+                        ######################################################################
+          
+                        print('New minheap is thus: ')
+                        show_tree(minq)
+                        if minq[0][1] < i:
+                          print('Position of minheap root is still less than i, continuing to pop (tail not following yet!)')
+                          print('\n')
+                          print('\n')
+          
+              res = max(res, j - i + 1) #checks old count vs new count of units between conditions
+              ### We could also save all the segments that were foudn and their lengths, their indexes. Right now, all that is needed
+              ### however is the longest segment length, however here we can extract all other relevant information, perhaps by 
+              ### constraining that only keep res info when j>i so that one-lengths are omitted. 
+          
+        </code>
+      </pre>
+          
+
+
+
+</div>
+
+
+
+<footer>
+  <br>
+  <br>
+  <br>
+</footer>
+
