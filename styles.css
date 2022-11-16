@@ -199,10 +199,11 @@ padding-top: 102px;
 
 
 .dpw-code {
-    white-space: pre-wrap; /* Wrap long lines */
-    word-break: break-all;
-    counter-reset: linecounter; /* Create line counter variable */
+    /*white-space: pre-wrap;  Wrap long lines */
+    /*word-break: break-all;*/
     overflow: auto;
+    counter-reset: linecounter; /* Create line counter variable */
+
     border-width: 1px;
     border-style: solid;
     border-color: #c4d1e6;
@@ -230,7 +231,7 @@ padding-top: 102px;
 
 
 .dpw-code-noNr {
-    white-space: pre-wrap; /* Wrap long lines */
+    white-space: pre-wrap;  Wrap long lines */
     word-break: break-all;
     overflow: auto;
     border-width: 1px;
