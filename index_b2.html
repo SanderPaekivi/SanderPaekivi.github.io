@@ -48,12 +48,12 @@ in time-series data</b>
       <h3>Introduction:</h3>
       <p style="text-align:justify; "> 
 
-        I revently happened upon an interesting problem: in a sequence, find the longes subsequence, for which the maximal difference does not cross a threshold. It seems like a very specific issue, 
-        but turns out to be quite a common test-asignment to gauge the applicants skill in programming. From a physics point of view, it has some other interesting applications. For example - finding subsequences 
-        that form characteristic regimes - fluctuating in between bounds set by the maximum difference. I'll demonstrate the specific later, but first to the point of the post! 
+        I recently happened upon an interesting problem: in a sequence, find the longes subsequence, for which the maximum difference does not cross a threshold. It seems like a very specific issue, 
+        but turns out to be quite a common test-asignment to gauge the applicants skill in programming. From a physicists point of view, it has some other interesting applications. For example - finding subsequences 
+        that form characteristic regimes - fluctuating in between bounds set by the maximum difference - remaining "persistent". I'll demonstrate the specifics later, but first to the point of the post! 
         <br><br>
 
-        The point of this post is not the applications of the stated problem, but the inner workings of a very clever solution to it, using "heap" datastructures! 
+        The point of this post is not really the applications of the stated problem, but the inner workings of a very clever solution to it, using "heap" data structures! 
         
         <br><br>
         
@@ -64,7 +64,7 @@ in time-series data</b>
           <li>An overview of the algorithm </li>
           <li>A step-by-step walkthrough of the algorithm </li>
           <li>Application to visualizing persistence in time-series</li>
-          <li>Closing remarks and relevant citations </li>
+          <li>Closing remarks and relevant code snipets </li>
         </ol>  
 
       </p>  
@@ -72,7 +72,7 @@ in time-series data</b>
       <h3>Heap datastructure:</h3>
         <p style="text-align:justify; "> 
           
-          I refer the reader to the in depth article on heaps by <a href="https://www.geeksforgeeks.org/heap-data-structure/" target="_blank">GeeksForGeeks</a>, but in brief - it is an
+          I refer the reader to the in depth documentation on heaps by <a href="https://www.geeksforgeeks.org/heap-data-structure/" target="_blank">GeeksForGeeks</a>, but in brief - it is an
           ordered binary tree, starting with either the largest (called a max-heap) or smallest (called a min-heap) element, and splitting leaves in two, placing descending or ascending values
           on them respectively. 
 
