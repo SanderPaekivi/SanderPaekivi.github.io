@@ -54,11 +54,11 @@ for adaptive autoregression</b>
 
         <br><br>
 
-        This blog post is a summary of what I've learned in my attempts to wrangle the Kalman Filter for the purpose of adaptive vector-autoregression - in practise the extraction of autoregression coefficients 
+        This blog post is a summary of what I've learned in my attempts to wrangle the Kalman Filter for the purpose of adaptive vector-autoregression - in practice the extraction of autoregression coefficients 
         in as continuous time as possible, between as many time-series as necessary. My motivation for looking into this implementation was application to statistical causality analysis, 
         where issues of non-stationarity can really obfuscate real relationships between time-series. A Kalman Filter based adaptive method was proposed in a variety of scientific
         papers, however the rigor in theoretical overview was oft lacking and contained errors, as well as the implementation code kept private. In principle, the method could be very powerful, 
-        in practise I have (so far) found that easier solutions work quicker and as effectively though. 
+        in practice I have (so far) found that easier solutions work quicker and as effectively though. 
         
         <br> <br>
 
@@ -84,8 +84,8 @@ for adaptive autoregression</b>
       <p style="text-align:justify; "> 
         
         To start off, lets briefly cover step-by-step the conventional autoregressive (AR) process - it is a model for a time-series process, which is dependent upon it's own past 
-        values - hence the prefix 'auto'. Oftan people also speak about vector-autoregression (VAR), which is the case of multiple time-series interacting with eachother and 
-        themselves. The vector part here will become clear soon, if it is not yet so (it's to do with the mathematical representation). For a single time-series, a simpel AR process 
+        values - hence the prefix 'auto'. Often people also speak about vector-autoregression (VAR), which is the case of multiple time-series interacting with each other and 
+        themselves. The vector part here will become clear soon, if it is not yet so (it's to do with the mathematical representation). For a single time-series, a simple AR process 
         is then the regression model between dependent \( y(t) \) and independend variables \( y(t-\tau) \), with \( \tau \) being the lag or time-delay. How far this lagged 
         influence goes is referred to as the order of the model, \(p\) and a model is written generally as AR(\(p\)) or VAR(\(p\)). 
 
@@ -101,7 +101,7 @@ for adaptive autoregression</b>
         Here we read it as modelling the value of the process \( y(t) \) at time \( t \) by summing over it's past values to a lag of \( \tau \), while multiplying each of these 
         past values by a coefficient \( c_\tau \). In this manner, the coefficients describe the influence of a past value, for all values of \( t \)! They cannot change, once the model
         has been fit. This is alright, if the underlying properties of the process do not change in this time frame. In any case however, we never expect the model coefficients to be
-        able to match the lefthand side of the equation 100% due to noize in the data or errors in data measurement, thus this part is modelled with the \(\epsilon(t)\) term. In practise
+        able to match the lefthand side of the equation 100% due to noize in the data or errors in data measurement, thus this part is modelled with the \(\epsilon(t)\) term. In practice
         this is simply the residual of the modeled value (righthand side summation) subtracted from the actual value. 
 
         <br><br>
@@ -147,7 +147,7 @@ for adaptive autoregression</b>
 
         <br><br>
 
-        Let's focuse on the formula for A and specifically, it's component \( X \). It is a matrix with size \( N \times p \), and as an example for a \( p=3 \), AR(3) process it contains 
+        Let's focus on the formula for A and specifically, it's component \( X \). It is a matrix with size \( N \times p \), and as an example for a \( p=3 \), AR(3) process it contains 
         \( y(t-1), ..., y(t-p) \) in it's rows, starting from  \( t+p+1 \) to facilitate \( p \) lags. 
 
         \[
@@ -217,9 +217,9 @@ for adaptive autoregression</b>
         Ok so now we need to figure out the component: \( X^T Y = \sum_i^N u_i y(i) \) - the second half of our coefficients expression. 
         <br><br>
         We will split it's sum to an \(N\) and \(N+1\) component, utilize the discovered equations for \(K\) and
-        \(F\), do some algebra and arrive at a result that I hope will be useful in understanding the inner workings of the Kalman Filter, without having to derrive it (it's much more tricky and tedious).
+        \(F\), do some algebra and arrive at a result that I hope will be useful in understanding the inner workings of the Kalman Filter, without having to derive it (it's much more tricky and tedious).
         <br><br>
-        Consider we start from \(N+1\) samples, whiddle down from there. We can write \(A\) as:
+        Consider we start from \(N+1\) samples, whittle  down from there. We can write \(A\) as:
 
         \[
         A_{N+1} = (X^T X)^{-1} X^T Y = F_{N+1}^{-1} \sum_i^{N+1} u_i y(i) = F_{N+1}^{-1} \biggl( \sum_i^{N} u_i y(i) + u_{N+1} y(N+1) \biggr)
@@ -237,15 +237,15 @@ for adaptive autoregression</b>
         \overbrace{ F_{N}^{-1} \sum_i^{N} u_i y(i) }^\text{optimal sol. at N}  - K_{N+1} u_{N+1}^T \overbrace{ F_N^{-1} \sum_i^{N} u_i y(i) }^\text{optimal sol. at N} + \overbrace{ F_{N+1}^{-1} u_{N+1} }^\text{K} y(N+1) 
         \]
         
-        And with this, picking up the pieces into brackets and expressing K where possible, we arrive at a new, reccursively updateable formula for A:
+        And with this, picking up the pieces into brackets and expressing K where possible, we arrive at a new, recursively updatable formula for A:
 
         \[
         A_{N+1} = A_N + K_{N+1} ( y(N+1) - u_{N+1}^T A_N )
         \]
 
-        The component \( K \) is oftan in Kalman Filtering called the 'gain matrix', and it has different derivation paths, however the main goal of this component is the same in RLS as in
+        The component \( K \) is often in Kalman Filtering called the 'gain matrix', and it has different derivation paths, however the main goal of this component is the same in RLS as in
         Kalman Filtering - weight up how much to adjust the coefficients of regression based on how large the error between the new measurement and old model prediction is! NB: I'm talking
-        about the Kalman Filter for the purpose of regression - somethign it's not really built for and most literature does not talk in terms relating to this.  
+        about the Kalman Filter for the purpose of regression - something it's not really built for and most literature does not talk in terms relating to this.  
       </p>
       
       <h3>Kalman Filter:</h3>
@@ -281,7 +281,7 @@ for adaptive autoregression</b>
         term \(v_k\). The latter does not help us 'estimate' a better value for the position directly, 
         but the relationship is what we build the Kalman Filter upon, specifically the Kalman Gain matrix \(K\) (similar to the RLS matrix \(K\)).
 
-        The noise terms are assumed to be zero centered and with independend covariance matrixes:
+        The noise terms are assumed to be zero centered and with independent covariance matrixes:
 
         \[
         w_k \sim N(0,Q)
@@ -298,8 +298,8 @@ for adaptive autoregression</b>
 
         We can do the same 
         for regression problems, however with some trickery. The main idea is to swap the 'state' equation for one evolving regression coefficients in time, and the 'measurement' equation for 
-        the regression model itself! Some difficulties arise due to us not havng any good idea on how to pick \(R\) however, as we generally will be dealing with already measured data from less defined
-        measurement device (not impossible, just in practise rarely the case). NB: we must choose an \(R\), as we cannot assume that our measured data is 100% accurate, otherwise the algorithm cannot balance 
+        the regression model itself! Some difficulties arise due to us not having any good idea on how to pick \(R\) however, as we generally will be dealing with already measured data from less defined
+        measurement device (not impossible, just in practice rarely the case). NB: we must choose an \(R\), as we cannot assume that our measured data is 100% accurate, otherwise the algorithm cannot balance 
         different noise sources. A second problem arises from choosing a state equation - while a car will move based on the laws of motion, how should regression coefficients evolve in time? 
 
         <br><br>
@@ -413,7 +413,7 @@ for adaptive autoregression</b>
         P_{k+1|k+1} = (I - K_{k+1}C)P_{k+1|k}(I-K_{k+1}C)^T + K_{k+1} R K_{k+1}^T 
         \]
 
-        Taking a partial derivative of the trace of the above (the trace of the covariance are the errors, however operating on the covariance matrix is necessary to acces them all in a VAR context), 
+        Taking a partial derivative of the trace of the above (the trace of the covariance are the errors, however operating on the covariance matrix is necessary to access them all in a VAR context), 
         with respect to \(K\) (requires some calculation, consider trace operator properties in relation to derivatives, skipped here to result):
 
         \[
@@ -426,7 +426,7 @@ for adaptive autoregression</b>
         K_{k+1} = P_{k+1|k} C^T (C P_{k+1|k}C^T + R)^{-1}
         \]
 
-        NB: there's some position swapping taking place here due to the transposes. Also, the component with the inverse brackets around it is oftan noted in literature as \(S\). 
+        NB: there's some position swapping taking place here due to the transposes. Also, the component with the inverse brackets around it is often noted in literature as \(S\). 
 
         If we now substitute this \(K\) into the formula for \(P_{k+1|k+1}\), we get our final update equation (after which we will also list the steps involved in utilizing them):
 
@@ -438,7 +438,7 @@ for adaptive autoregression</b>
         calculate the Kalman Gain, update the state \(X\) with the Gain, update the state covariance similarly, propagate the state forward (through the covariance matrix, the coefficients are developed only 
         by the Kalman Gain, not actual noise addition - the latter is important for deriving proper equations, but it's mean is zero) and repeat!
 
-        Puting the operations in order, we have the Kalman Filter algorithm as a list of steps: 
+        Putting the operations in order, we have the Kalman Filter algorithm as a list of steps: 
 
         <br>
         State evolution:
@@ -507,7 +507,7 @@ for adaptive autoregression</b>
         with \(D\) being the dimensionality or number of time-series in the VAR model we are solving. These example coefficients apply for the first time-series, as the index \(ij\) represents
         the regression coefficient in the direction \( j \rightarrow i \). <br> 
 
-        We could format this entirely as a matrix multiplication as well, and we shal - but for this we need to include some additional matrix stacking tools. Let's get right to it! <br><br> 
+        We could format this entirely as a matrix multiplication as well, and we shall - but for this we need to include some additional matrix stacking tools. Let's get right to it! <br><br> 
                 
         To estimate such coefficients, we formulate a state-space model with the following components: 
 
@@ -547,7 +547,7 @@ for adaptive autoregression</b>
         \]
 
         Here the lower indexes \( t|t \) and \( t+1|t \) represent the values before and after iterating through the state equation respectively (or after and before the measurement step, respectively).
-        Just a reminder - this implies an infinite recursion, which is true, but in practise we just fix an initial guess and start from there. <br>
+        Just a reminder - this implies an infinite recursion, which is true, but in practice we just fix an initial guess and start from there. <br>
         Next comes the 'Measurement update' step:
 
         \[
@@ -573,7 +573,7 @@ for adaptive autoregression</b>
       <p style="text-align:justify; "> 
 
         I've build my implementation to operate on data in the form of a pandas dataframe, with columns representing time indexes, and rows representing distinct time-series - 
-        the measurement dimensions. Considering \(D\) to be the dimensionality, or the number of time-series (with length \(N\) steps) analysied in the VAR model, and \(p\) the regression order, then 
+        the measurement dimensions. Considering \(D\) to be the dimensionality, or the number of time-series (with length \(N\) steps) analyzied in the VAR model, and \(p\) the regression order, then 
         the code yields a \(N-p\) coefficient matrixes. The latter are structured as follows:
 
         \[
@@ -581,7 +581,7 @@ for adaptive autoregression</b>
         \]
         
         
-        The above list of coefficients in this specific order, multipled by the vectorized \(p\) past values of the measurement vector that has been Kronecker multiplied in turn with 
+        The above list of coefficients in this specific order, multiplied by the vectorized \(p\) past values of the measurement vector that has been Kronecker multiplied in turn with 
         a \(D\text{x}D\) identity matrix yields exactly \(D\) equations with all dimensional directions summed up with their respective coefficients. The object 'Xhatstorage' in the below code
         contains a list of such coefficient matrixes, each element in the list corresponding to a time step. <br><br>
         !NB: The \(c_{ij}\) format used here is the same as explained above before the vectorization operation - this is the result of that procedure! <br>
@@ -590,7 +590,7 @@ for adaptive autoregression</b>
 
         <br><br>
 
-        I've included comments in the code to certain scientific paper that discuss an implementation such as this - their citations are given below the snipet. 
+        I've included comments in the code to certain scientific paper that discuss an implementation such as this - their citations are given below the snippet. 
 
 
         <pre class="line-numbers">
@@ -660,7 +660,7 @@ for adaptive autoregression</b>
               Rstorage = [np.eye(m)]*p #[[[1, 1],[1, 1]]]*p
               Pstorage = [np.identity((m**2)*p)]*p
 
-              for i in range(p,sL): #This is the Kalman VAR reccursion, based on Havlicek 2010 and Schlögl 2000 (specifically the adaption criteria lambda etc)
+              for i in range(p,sL): #This is the Kalman VAR recursion, based on Havlicek 2010 and Schlögl 2000 (specifically the adaption criteria lambda etc)
                   
                   Y = data[:,range((i-p),i+1)] 
                   #Partitioning necessary data for p-length loop, including next one for update and prediction comparison.
