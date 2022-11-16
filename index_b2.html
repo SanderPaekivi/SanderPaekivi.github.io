@@ -673,8 +673,8 @@ Current minheap is:
 
         <pre class="line-numbers">
           <code class="language-css">
-import heapq
 def constrainedSubarrayHist(A, limit):
+    import heapq
     len_dict = {}
     maxq, minq = [], []
     res = i = 0
@@ -685,14 +685,20 @@ def constrainedSubarrayHist(A, limit):
             i = min(maxq[0][1], minq[0][1]) + 1
             while maxq[0][1] < i: heapq.heappop(maxq)
             while minq[0][1] < i: heapq.heappop(minq)
+            if res in len_dict and res > 1:
+              len_dict[res] += 1
+              res = 0
+            elif res > 1:
+              len_dict[res] = 1
+              res = 0
         res = (j - i + 1)
-        
-        if res in len_dict:
-          len_dict[res] += 1
-        else:
-            len_dict[res] = 1
-        
-    return len_dict            
+    if res in len_dict and res > 1:
+      len_dict[res] += 1
+      res = 0
+    elif res > 1:
+      len_dict[res] = 1
+      res = 0
+    return len_dict                             
           </code>
         </pre>
 
@@ -722,13 +728,16 @@ def constrainedSubarrayHist(A, limit):
 
         <p style="text-align:justify; ">
         
-          We notice very little deviation from the two histograms, but a clear preference for longer sequences by Estonia. That is to say, there are on average longer periods of days
-          where the temperature does not shift by the 95th quantile shift. 
+          We notice a cacophony of differences and overlaps between the two histograms. It's unclear if there are different temperature persistence patterns at play, perhaps they are simply offset 
+          from each other, or the quantile level is not optimal to reflect a "typical extreme" threshold (seemed like the best I could cursory find at the time at least). If this graph is to
+          be interpreted however, then it appears that there is a preference for longer sequences by Estonia. That is to say, there are on average longer periods of days where the 
+          temperature does not shift by the 95th quantile shift. 
 
           <br><br>
 
           A bit more clearer is the second approach. Let's simply say, that we are looking for the distribution of lengths of sequential days, where the maximal difference in 
-          temperatures does not cross 4 degrees. Perhaps it's a bit low, but it should not change the relationship of the two countries histograms much. 
+          temperatures does not cross 6 degrees. The particular value changes the shape of individual histograms, but it does not change the relationship between them much (at least in 
+          a certain scaling region, that is to say around the values 3-7 where i checked). 
 
         </p>
 
@@ -739,8 +748,9 @@ def constrainedSubarrayHist(A, limit):
         <p style="text-align:justify; ">
 
           It turns out, that for a fixed temperature threshold, the differences between Portugal and Estonia are the opposite! They are also more visible, with Portugal preferring longer 
-          sequences constrained by the 4 degree bounds. We could interpret this as portugal showing on average longer periods without larger than 4 degree shifts, thus more stabile 
-          temperature in general. This is why both thresholding methods hold valuable information. 
+          sequences constrained by the 6 degree bounds. We could interpret this as Portugal showing on average longer periods without larger than 6 degree shifts, thus more stabile 
+          temperature in general. At the same time, the large peak in short sequences for Estonia reveals it's temperamental weather temperature changes - things don't stay the "same"
+          for as long. I believe both thresholding methods hold valuable information however. 
           
           <br><br>
 
