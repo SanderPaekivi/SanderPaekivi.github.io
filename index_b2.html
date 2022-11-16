@@ -646,9 +646,16 @@ Current minheap is:
         <br><br>
 
         Let me clarify things, by focusing in on my own background: time-series analysis. For example, air temperature - it changes daily, monthly, yearly.. it has trends and seasons. 
-        The temperature day-to-day however is different around the world, not only in magnitude but by the persistence of values. Since we are dealign with a stochastic phenomenon, we already 
+        The temperature day-to-day however is different around the world, not only in magnitude but by the persistence of values. Since we are dealing with a stochastic phenomenon, we already 
         expect some noize in a daily measure of temperature and thus not smooth changes, but we don't expect the temperature to change "too much" from day to day. While extreme shifts happen, 
         they are rare by their nature.  
+
+        <br><br>
+
+        Immagine a summer week, where every 
+        day the temperature is around ... 30 degrees Celsius. One day it's 31, then 29, then 32, etc. These are all consecutive days within a 4 degree threshold, for example. 
+        As the summer ends, more and more the temperatures lower, but gradually. When a sudden shift happens, say 31,29,25,20 - here we are breaking form and seeing extreme changes. 
+        The lengths between these extreme events is what we are measuring by finding subarrays with bounded maximal difference! They are the intervals between extreme shifts.  
 
         <br><br>
 
@@ -699,10 +706,7 @@ def constrainedSubarrayHist(A, limit):
         <br><br>
 
         Another way to define the threshold heuristically, deciding ourselves what constitutes "too large" of a change in the day to day temperature such that we would not consider the days 
-        to have had "roughly the same" temperature. That is a decent interpretation of the subarray problem. Immagine a summer week, where every 
-        day the temperature is around ... 30 degrees Celsius. One day it's 31, then 29, then 32, etc. These are all consecutive days within a 4 degree threshold, for example. 
-        As the summer ends, more and more the temperatures lower, but gradually. When a sudden shift happens, say 31,29,25,20 - here we are breaking form and seeing extreme changes. 
-        The lengths between these extreme events is what we are measuring, in both cases - what is different is the thresholds meaning.  
+        to have had "roughly the same" temperature. That is a decent interpretation of the subarray problem.  
         
         <br><br>
 
