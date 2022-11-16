@@ -49,7 +49,7 @@ in time-series data</b>
       <p style="text-align:justify; "> 
 
         I recently happened upon an interesting problem: in a sequence, find the longes subsequence, for which the maximum difference does not cross a threshold. It seems like a very specific issue, 
-        but turns out to be quite a common test-asignment to gauge the applicants skill in programming. From a physicists point of view, it has some other interesting applications. For example - finding subsequences 
+        but turns out to be quite a common test-assignment to gauge the applicants skill in programming. From a physicists point of view, it has some other interesting applications. For example - finding subsequences 
         that form characteristic regimes - fluctuating in between bounds set by the maximum difference - remaining "persistent". I'll demonstrate the specifics later, but first to the point of the post! 
         <br><br>
 
@@ -60,11 +60,11 @@ in time-series data</b>
         The post is structured as follows: 
         
         <ol>
-          <li>An overview of the heap datastructure</li>
+          <li>An overview of the heap data structure</li>
           <li>An overview of the algorithm </li>
           <li>A step-by-step walkthrough of the algorithm </li>
           <li>Application to visualizing persistence in time-series</li>
-          <li>Closing remarks and relevant code snipets </li>
+          <li>Closing remarks and relevant code snippets </li>
         </ol>  
 
       </p>  
@@ -85,19 +85,19 @@ in time-series data</b>
         <p style="text-align:justify; "> 
         
         In the above image, the min-heap is built from the numbers [10,15,30,40,40,50,100]. The heap is built one by one, as in the numbers are thrown on to a heap, and some rules govern
-        what the heap will then look like. A min-heap would be something where the heavier things (larger numbers) roll deeper, building the bottom of the heap and the ligher things stay on top. 
+        what the heap will then look like. A min-heap would be something where the heavier things (larger numbers) roll deeper, building the bottom of the heap and the lighter things stay on top. 
         We don't know exactly what the sequence that this example heap was made of looked like, but we can propose one that would give rise to such a min-heap and learn intuitively what is happening. 
         For example, the sequence [40, 10, 30, 15, 50, 100, 40 ].
 
         <br><br>
 
         We start with 40, this will become the root node at first. Next we add underneath the root the number 10. We see that this is "lighter", so we swap their positions, keeping 10 as the root
-        and 40 as its first leaf. Next comes in the value 30, which is "heavier" than 10, and since we have two brances from the root, we have space for it next to 40. The rules are sattisfied,
-        as the root is the smallest, and it brances into two leaves, whose values must be larger. 
+        and 40 as its first leaf. Next comes in the value 30, which is "heavier" than 10, and since we have two branches from the root, we have space for it next to 40. The rules are satisfied,
+        as the root is the smallest, and it branches into two leaves, whose values must be larger. 
         
         <br><br>
 
-        Next comes 15. We start from the leftmost new leaf, the newly branched into two number 40. 15 is "lighter" than 40, so we spaw their places. We further check, if 15 is lighter than the root.
+        Next comes 15. We start from the leftmost new leaf, the newly branched into two number 40. 15 is "lighter" than 40, so we swap their places. We further check, if 15 is lighter than the root.
         It is not, so things remains as such, with the leftmost branch structure following 10, 15, 40. After this we get 50, adding it to the remaining free leaf next to 40, and similarly for 100 and 40, as they
         do not call for swapping positions in leaf layers, and we just need them to be larger than their parent leaf! 
         
@@ -172,9 +172,9 @@ def longestSubarray(A, limit):
 
           <br><br>
 
-          In fact, the two heaps that are built simultaneously, min- and max-heaps, they operate as the left and right edge of this crawler. Immagine a caterpillar crawling over a bumpy 
+          In fact, the two heaps that are built simultaneously, min- and max-heaps, they operate as the left and right edge of this crawler. Imagine a caterpillar crawling over a bumpy 
           landscape, where the heights of the bumps are representative of the value of the numbers (just a plot of the sequence with the x-axis being the position in sequence). This caterpillar 
-          will strech and shrink, moving along, keeping in mind where it had to make large step (breaking the threshold criteria) and where it could comfortably crawl along. Notice that the 
+          will stretch and shrink, moving along, keeping in mind where it had to make large step (breaking the threshold criteria) and where it could comfortably crawl along. Notice that the 
           code has ".heappop" involved, that removes the root-element from the heap. This is representative of either the left or right end of the caterpillar moving forward, "leaving it's old position, replacing it with a new position", like 
           in the swapping procedure in ordering the heap. Let's just get into it and it will hopefully be more clear.  
           
@@ -264,8 +264,8 @@ Current minheap is:
 
         <p style="text-align:justify; "> 
           We see that both the heaps are taking form as intended - the second leaves are forming and keeping the ordered structure of the respective heaps. We know however, that the difference
-          between 9 and 1 is greater than 3, our chosen threshold. Thus, we need to move the caterpiller - by removing values from either heap, that are LEFT of the new value, as any further extension of the 
-          right edge cannot fix the criteria - the current values our caterpiller covers already exceed the criteria and will continue to do so. 
+          between 9 and 1 is greater than 3, our chosen threshold. Thus, we need to move the caterpillar - by removing values from either heap, that are LEFT of the new value, as any further extension of the 
+          right edge cannot fix the criteria - the current values our caterpillar covers already exceed the criteria and will continue to do so. 
         </p>  
 
         <pre class="line-numbers">
@@ -387,7 +387,7 @@ New minheap is thus:
         </pre>     
      
         <p style="text-align:justify; "> 
-          While we pulled the left edge forward, it still does not yield a sequence that fulfilles the criteria, so we keep crawling until. For now, this will result in both left and right edges being on the same
+          While we pulled the left edge forward, it still does not yield a sequence that fulfills the criteria, so we keep crawling until. For now, this will result in both left and right edges being on the same
           position again, and then crawling forward. 
         </p> 
 
@@ -537,13 +537,13 @@ New minheap is thus:
 
         <p style="text-align:justify; "> 
           Now something interesting happened. We use removal of a heaps root element, or popping, to crawl the LEFT edge along, whichever heap that might currently be. So it's not too 
-          hard to see, that at some point, there might be some confusion in which extreme value is in which spot, and where are they in relation to eachother in the heaps... This is what happened here.
+          hard to see, that at some point, there might be some confusion in which extreme value is in which spot, and where are they in relation to each other in the heaps... This is what happened here.
           We popped the previous left edge, the value 3 from the min-heap. This caused however the new root to become a value from further away, 7! The edges of our crawler are on the value 8, but the 
           heaps keeping track of the magnitudes of these positions are mismatched.
           
           <br><br>
 
-          No problem! Just keep popping until the match up, then crawl further right! That's why the algorithm is wirtten with a while statement!
+          No problem! Just keep popping until the match up, then crawl further right! That's why the algorithm is written with a while statement!
         </p> 
 
         <pre class="line-numbers">
@@ -635,11 +635,11 @@ Current minheap is:
           This is why the left edge in the algorithm is constructed separately, and only adjusted as the minimum of both heaps roots if the criteria breaks.   
         </p> 
      
-      <h3>Persistence in sequences and criteria fulfilling subseuqnces - related?</h3>
+      <h3>Persistence in sequences and criteria fulfilling subsequences - related?</h3>
 
       <p style="text-align:justify; "> 
 
-        The idea of tracking the lengths of subsequences fulfilling some condition relating to extremes is quite interesting. This touches upon the consept of "persistence", or how likely are things
+        The idea of tracking the lengths of subsequences fulfilling some condition relating to extremes is quite interesting. This touches upon the concept of "persistence", or how likely are things
         to stay the way they currently are. The matter of "how things currently are" is not so simple itself, so having some error bounds can help... the criteria.. but when things change beyond
         this criteria, they are not the same.. so how long did the previous "now" last and how long will the new "now" last? 
         
@@ -652,7 +652,7 @@ Current minheap is:
 
         <br><br>
 
-        Immagine a summer week, where every 
+        Imagine a summer week, where every 
         day the temperature is around ... 30 degrees Celsius. One day it's 31, then 29, then 32, etc. These are all consecutive days within a 4 degree threshold, for example. 
         As the summer ends, more and more the temperatures lower, but gradually. When a sudden shift happens, say 31,29,25,20 - here we are breaking form and seeing extreme changes. 
         The lengths between these extreme events is what we are measuring by finding subarrays with bounded maximal difference! They are the intervals between extreme shifts.  
@@ -664,8 +664,8 @@ Current minheap is:
         <br><br>
 
         I'll be using the daily mean temperature data from the <a href="https://www.ecad.eu/" target="_blank">ECA-D</a>
-        website for Portugal (Lisboa Geofisica) and Estonia (Tallinn) and the period will be from 2000 to 2020 (ending on the last day of october). I'll deseason the data by subtracting the
-        day-of-year ensamble means and run through the resulting anomalies time-series with the crawler! This time however, i'll modify the crawler to keep track of the number of times it saw 
+        website for Portugal (Lisboa Geofisica) and Estonia (Tallinn) and the period will be from 2000 to 2020 (ending on the last day of october). I'll de-season the data by subtracting the
+        day-of-year ensemble means and run through the resulting anomalies time-series with the crawler! This time however, i'll modify the crawler to keep track of the number of times it saw 
         a sequence length fulfilling the criteria, thus yielding a dictionary of {Length:Count}. 
       
         </p>
@@ -699,7 +699,7 @@ def constrainedSubarrayHist(A, limit):
         <p style="text-align:justify; ">
         
         We now need a method to choose a threshold, as we want the results for Estonia and Portugal to be comparable. One approach is to calculate the differences sequence, and choose 
-        a quantile. That is to say, we choose the threshold magnitud to be such that a certain percentage of the differences are less than this value, thus tuning the "how extreme" meaning
+        a quantile. That is to say, we choose the threshold magnitude to be such that a certain percentage of the differences are less than this value, thus tuning the "how extreme" meaning
         of the threshold. A higher quantile will most likely yield many counts for long segments compared to a lower quantile - because the latter is more common, thus breaking the criteria 
         more oftan. 
 
@@ -710,7 +710,7 @@ def constrainedSubarrayHist(A, limit):
         
         <br><br>
 
-        Both can be useful, so I'll demonstrate them here together. First the quantile approach. I choose the cosntraint to be the 95th quantile, that is to say, I count the number of sequential
+        Both can be useful, so I'll demonstrate them here together. First the quantile approach. I choose the constraint to be the 95th quantile, that is to say, I count the number of sequential
         days where the largest difference of temperatures is no greater than the difference seen only 5% of the days in the past 20 years. This value will be different for the regions, but it's
         proportional meaning is the same. From the 20 years of data, I count how many times did any length of such continuous sequences occur, and plot the relevant histogram for Portugal and 
         Estonia below:
@@ -727,7 +727,7 @@ def constrainedSubarrayHist(A, limit):
 
           <br><br>
 
-          A bit more clearer is the second approach. Let's simply say, that we are looking for the distribution of lengths of sequential days, wehere the maximal difference in 
+          A bit more clearer is the second approach. Let's simply say, that we are looking for the distribution of lengths of sequential days, where the maximal difference in 
           temperatures does not cross 4 degrees. Perhaps it's a bit low, but it should not change the relationship of the two countries histograms much. 
 
         </p>
@@ -738,7 +738,7 @@ def constrainedSubarrayHist(A, limit):
 
         <p style="text-align:justify; ">
 
-          It turns out, that for a fixed temperature threshold, the differences between Portugal and Estonia are the oposite! They are also more visible, with Portugal preferring longer 
+          It turns out, that for a fixed temperature threshold, the differences between Portugal and Estonia are the opposite! They are also more visible, with Portugal preferring longer 
           sequences constrained by the 4 degree bounds. We could interpret this as portugal showing on average longer periods without larger than 4 degree shifts, thus more stabile 
           temperature in general. This is why both thresholding methods hold valuable information. 
           
@@ -746,7 +746,7 @@ def constrainedSubarrayHist(A, limit):
 
           The quantile approach describes stability in terms of relative extremes. The fixed threshold describes stability in terms of a specific temperature value, without regard to 
           the baseline. In terms of temperature persistence we observe then that Portugal has more persistent wether, while in the context of their geographic regions, the differences are
-          not so grand, perhaps even the oposite. Going any further in interpretation and analysis requires however different tools and more specific climatological expertice. 
+          not so grand, perhaps even the opposite. Going any further in interpretation and analysis requires however different tools and more specific climatological expertise. 
           
         </p>
 
