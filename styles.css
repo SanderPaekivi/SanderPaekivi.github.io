@@ -235,8 +235,7 @@ padding-top: 102px;
 
 
 .dpw-code-noNr {
-    white-space: pre-wrap;  Wrap long lines */
-    word-break: break-all;
+
     overflow: auto;
     border-width: 1px;
     border-style: solid;
