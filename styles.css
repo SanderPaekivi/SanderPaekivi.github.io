@@ -206,3 +206,17 @@ padding-top: 102px;
     width: auto\9;
 }
 
+.single-image-2{
+    border-radius: 1em; 
+    object-fit: cover; 
+    object-position: 0 0; 
+    max-width: 50%;
+    height: auto;
+    width: auto\9;
+}
+
+@media screen and (max-width: 800px){
+    .single-image-2{
+        max-width: 75%;
+    }
+ } 
